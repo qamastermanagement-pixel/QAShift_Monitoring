@@ -1,3 +1,6 @@
+// Import CONFIG from config.js
+import { CONFIG } from "./config.js"
+
 // Data master per channel (HARDCODED - tidak perlu Google Sheets)
 const CHANNEL_MASTERS = {
   1: ["Master A1", "Master B1", "Master C1", "Master D1", "Master E1"],
@@ -117,45 +120,39 @@ const CHANNEL_MASTERS = {
   16: ["Master A16", "Master B16", "Master C16", "Master D16", "Master E16"],
 }
 
-// Configuration object
-const CONFIG = {
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxNF9XVOIyF-vcQcfzCR9XTW9ysb5GRu2e26nNW9207ftUm-YpCJwYHz3MRucv5DdTMKA/exec",
-}
-
-// Initialize form when page loads
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("[v0] Form.js loaded")
+  console.log("[v0] CONFIG from config.js:", CONFIG)
+
   // Set today's date as default
   const today = new Date().toISOString().split("T")[0]
   document.getElementById("tanggal").value = today
 
-  // Populate channel dropdown
-  const channelSelect = document.getElementById("channel")
-  for (let i = 1; i <= 16; i++) {
-    const option = document.createElement("option")
-    option.value = i
-    option.textContent = `Channel ${i}`
-    channelSelect.appendChild(option)
-  }
-
   // Handle basic info form submission
   document.getElementById("basicInfoForm").addEventListener("submit", (e) => {
     e.preventDefault()
+    console.log("[v0] Form submitted, going to step 2")
     goToStep2()
   })
 
   // Handle master check form submission
   document.getElementById("masterCheckForm").addEventListener("submit", (e) => {
     e.preventDefault()
+    console.log("[v0] Master check form submitted")
     submitData()
   })
 })
 
 // Go to step 2 (master check)
 function goToStep2() {
+  console.log("[v0] goToStep2 function called")
+
   const tanggal = document.getElementById("tanggal").value
   const shift = document.getElementById("shift").value
   const npk = document.getElementById("npk").value
   const channel = document.getElementById("channel").value
+
+  console.log("[v0] Form values:", { tanggal, shift, npk, channel })
 
   if (!tanggal || !shift || !npk || !channel) {
     alert("Semua field harus diisi!")
@@ -173,6 +170,13 @@ function goToStep2() {
 
   // Get masters for selected channel
   const masters = CHANNEL_MASTERS[channel]
+  console.log("[v0] Masters for channel", channel, ":", masters)
+
+  if (!masters) {
+    alert("Data master untuk channel " + channel + " tidak ditemukan!")
+    return
+  }
+
   document.getElementById("totalMasters").textContent = masters.length
 
   // Generate master list
@@ -212,6 +216,8 @@ function goToStep2() {
     masterList.appendChild(masterItem)
   })
 
+  console.log("[v0] Master list generated, switching to step 2")
+
   // Switch to step 2
   document.getElementById("step1").classList.remove("active")
   document.getElementById("step2").classList.add("active")
@@ -249,7 +255,6 @@ function selectStatus(index, status) {
   ngBtn.dataset.status = status
 }
 
-// Submit data to Google Sheets
 async function submitData() {
   const channel = sessionStorage.getItem("channel")
   const masters = CHANNEL_MASTERS[channel]
