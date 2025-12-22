@@ -1,11 +1,12 @@
-import { Chart } from "@/components/ui/chart"
-
 let allData = []
 let chartInstance = null
-const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxNF9XVOIyF-vcQcfzCR9XTW9ysb5GRu2e26nNW9207ftUm-YpCJwYHz3MRucv5DdTMKA/exec" } // Declare CONFIG variable
+const CONFIG = window.CONFIG // Declare CONFIG variable from window object
 
 // Initialize dashboard when page loads
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("[v0] Dashboard.js loaded")
+  console.log("[v0] CONFIG from config.js:", CONFIG)
+
   // Set today's date as default filter
   const today = new Date().toISOString().split("T")[0]
   document.getElementById("filterDate").value = today
@@ -180,8 +181,8 @@ function updateChart(data) {
     chartInstance.destroy()
   }
 
-  // Create new chart
-  chartInstance = new Chart(ctx, {
+  // Create new chart using vanilla Chart.js
+  chartInstance = new window.Chart(ctx, {
     type: "doughnut",
     data: {
       labels: ["OK Masters", "NG Masters"],
