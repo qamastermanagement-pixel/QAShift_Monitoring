@@ -2,7 +2,7 @@ import { Chart } from "@/components/ui/chart"
 
 let allData = []
 let chartInstance = null
-const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec" } // Declare CONFIG variable
+const CONFIG = { APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxNF9XVOIyF-vcQcfzCR9XTW9ysb5GRu2e26nNW9207ftUm-YpCJwYHz3MRucv5DdTMKA/exec" } // Declare CONFIG variable
 
 // Initialize dashboard when page loads
 document.addEventListener("DOMContentLoaded", () => {
