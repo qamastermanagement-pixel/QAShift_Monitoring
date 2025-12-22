@@ -1,6 +1,3 @@
-// Import CONFIG from config.js
-import { CONFIG } from "./config.js"
-
 // Data master per channel (HARDCODED - tidak perlu Google Sheets)
 const CHANNEL_MASTERS = {
   1: ["Master A1", "Master B1", "Master C1", "Master D1", "Master E1"],
@@ -122,7 +119,6 @@ const CHANNEL_MASTERS = {
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("[v0] Form.js loaded")
-  console.log("[v0] CONFIG from config.js:", CONFIG)
 
   // Set today's date as default
   const today = new Date().toISOString().split("T")[0]
@@ -260,7 +256,10 @@ async function submitData() {
   const masters = CHANNEL_MASTERS[channel]
 
   console.log("[v0] Submitting data...")
-  console.log("[v0] Apps Script URL:", CONFIG.APPS_SCRIPT_URL)
+  const appsScriptUrl = window.CONFIG
+    ? window.CONFIG.APPS_SCRIPT_URL
+    : "https://script.google.com/macros/s/AKfycbxNF9XVOIyF-vcQcfzCR9XTW9ysb5GRu2e26nNW9207ftUm-YpCJwYHz3MRucv5DdTMKA/exec"
+  console.log("[v0] Apps Script URL:", appsScriptUrl)
 
   // Collect master check results
   const masterResults = []
@@ -314,7 +313,7 @@ async function submitData() {
 
   try {
     // Send data to Google Apps Script
-    const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+    const response = await fetch(appsScriptUrl, {
       method: "POST",
       headers: {
         "Content-Type": "text/plain;charset=utf-8",
