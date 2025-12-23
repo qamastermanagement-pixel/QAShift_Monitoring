@@ -454,7 +454,7 @@ async function submitData() {
   console.log("[v0] Submitting data...")
   const appsScriptUrl = window.CONFIG
     ? window.CONFIG.APPS_SCRIPT_URL
-    : "https://script.google.com/macros/library/d/1OfmVtkDn9-cWhWeAYC5IqK6G9qhdLCpHW-Pzpqraty7BY_AAMDWfO0xq/6"
+    : "https://script.google.com/macros/s/AKfycbytpHuYFDR_G-sugVMYFVpEbw1uQObHt68HiiRsuo01YybVLh_otjhjW971CO9QrH5gtA/exec"
   console.log("[v0] Apps Script URL:", appsScriptUrl)
 
   // Collect master check results
