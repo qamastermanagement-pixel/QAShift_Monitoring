@@ -482,8 +482,7 @@ async function submitData() {
       }
     }
 
-    const masterData =
-      typeof masters[i] === "string" ? { name: masters[i], code: "" } : { name: masters[i].name, code: masters[i].code }
+    const masterData = { name: masters[i].name, code: masters[i].code };
 
     masterResults.push({
       name: masterData.name,
