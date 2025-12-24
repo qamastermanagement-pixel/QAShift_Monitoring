@@ -1,11 +1,10 @@
 let allData = []
 let chartInstance = null
-const CONFIG = window.CONFIG // Declare CONFIG variable from window object
 
 // Initialize dashboard when page loads
 document.addEventListener("DOMContentLoaded", () => {
   console.log("[v0] Dashboard.js loaded")
-  console.log("[v0] CONFIG from config.js:", CONFIG)
+  console.log("[v0] CONFIG from config.js:", window.CONFIG)
 
   // Set today's date as default filter
   const today = new Date().toISOString().split("T")[0]
@@ -23,10 +22,10 @@ document.addEventListener("DOMContentLoaded", () => {
 // Load data from Google Apps Script
 async function loadData() {
   console.log("[v0] Loading data from Google Sheets...")
-  console.log("[v0] Apps Script URL:", CONFIG.APPS_SCRIPT_URL)
+  console.log("[v0] Apps Script URL:", window.CONFIG.APPS_SCRIPT_URL)
 
   try {
-    const response = await fetch(CONFIG.APPS_SCRIPT_URL)
+    const response = await fetch(window.CONFIG.APPS_SCRIPT_URL)
     const result = await response.json()
 
     console.log("[v0] Response:", result)
