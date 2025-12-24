@@ -712,3 +712,11 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Limit chart size */
+#statusChart {
+  width: 100%;
+  max-width: 280px;   /* batas lebar */
+  max-height: 280px;  /* batas tinggi */
+  margin: 0 auto;     /* center */
+}
