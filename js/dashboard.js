@@ -25,7 +25,9 @@ async function loadData() {
   console.log("[v0] Apps Script URL:", window.CONFIG.APPS_SCRIPT_URL)
 
   try {
-    const filterDate = document.getElementById("filterDate").value
+    const rawDate = document.getElementById("filterDate").value
+    const filterDate = new Date(rawDate).toISOString().split("T")[0]
+
     const response = await fetch(`${window.CONFIG.APPS_SCRIPT_URL}?date=${filterDate}`)
     const result = await response.json()
 
@@ -51,7 +53,8 @@ async function loadData() {
 
 // Filter and display data based on selected date
 function filterAndDisplayData() {
-  const filterDate = document.getElementById("filterDate").value
+  const rawDate = document.getElementById("filterDate").value
+  const filterDate = new Date(rawDate).toISOString().split("T")[0]
 
   console.log("[v0] Filtering data for date:", filterDate)
 
