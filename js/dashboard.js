@@ -10,6 +10,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const today = new Date().toISOString().split("T")[0]
   document.getElementById("filterDate").value = today
 
+  //fUNCTION PARSER
+  function normalizeDateInput(rawDate) {
+      // Kalau sudah ISO (YYYY-MM-DD), langsung return
+  if (/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
+    return rawDate;
+  }
+ 
+    // Kalau format DD/MM/YYYY → ubah ke YYYY-MM-DD
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(rawDate)) {
+    const [day, month, year] = rawDate.split("/");
+    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  }
+
+    // Fallback terakhir: coba parse pakai Date()
+  try {
+    return new Date(rawDate).toISOString().split("T")[0];
+  } catch {
+    return rawDate; // biarin mentah kalau gagal
+  }
+}
+
+  
   // Load data from Google Sheets
   loadData()
 
@@ -26,9 +48,8 @@ async function loadData() {
 
   try {
     const rawDate = document.getElementById("filterDate").value
-    const filterDate = new Date(rawDate).toISOString().split("T")[0]
-
-    const response = await fetch(`${window.CONFIG.APPS_SCRIPT_URL}?date=${filterDate}`)
+    const filterDate = normalizeDateInput(rawDate);
+    const response = await fetch(`${window.CONFIG.APPS_SCRIPT_URL}?date=${filterDate}`);
     const result = await response.json()
 
     console.log("[v0] Response:", result)
@@ -53,16 +74,15 @@ async function loadData() {
 
 // Filter and display data based on selected date
 function filterAndDisplayData() {
-  const rawDate = document.getElementById("filterDate").value
-  const filterDate = new Date(rawDate).toISOString().split("T")[0]
+  const rawDate = document.getElementById("filterDate").value;
+  const filterDate = normalizeDateInput(rawDate); //pakai parser ini
 
-  console.log("[v0] Filtering data for date:", filterDate)
+console.log("[v0] Filtering data for date:", filterDate);
 
-  // Filter data by date
-  const filteredData = allData.filter((entry) => {
-    const entryDate = entry.Tanggal
-    return entryDate === filterDate
-  })
+const filteredData = allData.filter((entry) => {
+  const entryDate = entry.Tanggal;
+  return entryDate === filterDate;
+});
 
   console.log("[v0] Filtered data:", filteredData.length, "entries")
 
