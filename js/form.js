@@ -726,6 +726,7 @@ async function submitData() {
         shift: sessionStorage.getItem("shift"),
         npk: sessionStorage.getItem("npk"),
         channel: `Channel ${channel}`,
+        bearingType: bearingType,
         masters: masterResults,
     }
 
