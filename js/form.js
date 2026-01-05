@@ -542,19 +542,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         //Script populate bearingType
         document.getElementById("channel").addEventListener("change", function () {
-            const channel = this.value
-            const bearingSelect = document.getElementById("bearingType")
-            bearingSelect.innerHTML = '<option value="">--Pilih Tipe--</option>'
+            const channel = this.value;
+            const bearingSelect = document.getElementById("bearingType");
+            bearingSelect.innerHTML = '<option value="">--Pilih Tipe--</option>';
+
+           console.log("Channel selected:", channel, CHANNEL_MASTERS[channel]);
 
             if (CHANNEL_MASTERS[channel]) {
                 Object.keys(CHANNEL_MASTERS[channel]).forEach(type => {
-                    const opt = document.createElement("option")
-                    opt.value = type
-                    opt.textContent = type
-                    bearingSelect.appendChild(opt)
-                })
+                    const opt = document.createElement("option");
+                    opt.value = type;
+                    opt.textContent = type;
+                    bearingSelect.appendChild(opt);
+                });
             }
-        })
+        });
     })
 
 // Go to step 2 (master check)
