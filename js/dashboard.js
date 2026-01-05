@@ -1,193 +1,179 @@
 let allData = []
 let chartInstance = null
 
-// Initialize dashboard when page loads
+// ================================
+// INIT
+// ================================
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("[v0] Dashboard.js loaded")
-  console.log("[v0] CONFIG from config.js:", window.CONFIG)
+  console.log("[v1] Dashboard.js loaded")
+  console.log("[v1] CONFIG:", window.CONFIG)
 
-  // Set today's date as default filter
+  // default date = today
   const today = new Date().toISOString().split("T")[0]
   document.getElementById("filterDate").value = today
 
-  // Load data from Google Sheets
   loadData()
 
-  // Filter date change listener
-  document.getElementById("filterDate").addEventListener("change", () => {
-    filterAndDisplayData()
-  })
+  document
+    .getElementById("filterDate")
+    .addEventListener("change", filterAndDisplayData)
 })
 
-// Load data from Google Apps Script
+// ================================
+// LOAD DATA
+// ================================
 async function loadData() {
-  console.log("[v0] Loading data from Google Sheets...")
-  console.log("[v0] Apps Script URL:", window.CONFIG.APPS_SCRIPT_URL)
-
   try {
-    const response = await fetch(window.CONFIG.APPS_SCRIPT_URL)
-    const result = await response.json()
-
-    console.log("[v0] Response:", result)
+    console.log("[v1] Fetching data...")
+    const res = await fetch(window.CONFIG.APPS_SCRIPT_URL)
+    const result = await res.json()
 
     if (result.status === "success") {
       allData = result.data || []
-      console.log("[v0] Loaded data:", allData.length, "entries")
+      console.log("[v1] Data loaded:", allData.length)
     } else {
-      console.error("[v0] Error from API:", result.message)
       allData = []
+      console.error("[v1] API error:", result.message)
     }
 
     filterAndDisplayData()
-  } catch (error) {
-    console.error("[v0] Error loading data:", error)
-    alert("Gagal memuat data. Pastikan Google Sheets sudah ada data.")
+  } catch (err) {
+    console.error("[v1] Fetch failed:", err)
     allData = []
     filterAndDisplayData()
   }
 }
 
-// Filter and display data based on selected date
+// ================================
+// FILTER
+// ================================
 function filterAndDisplayData() {
   const filterDate = document.getElementById("filterDate").value
+  console.log("[v1] Filter date:", filterDate)
 
-  console.log("[v0] Filtering data for date:", filterDate)
-
-  // Filter data by date
   const filteredData = allData.filter((entry) => {
-    const entryDate = entry.Tanggal
+    const entryDate = String(entry.Tanggal).split("T")[0]
     return entryDate === filterDate
   })
 
-  console.log("[v0] Filtered data:", filteredData.length, "entries")
+  console.log("[v1] Filtered:", filteredData.length)
 
-  // Update stats
   updateStats(filteredData)
-
-  // Update channel table
   updateChannelTable(filteredData)
-
-  // Update chart
   updateChart(filteredData)
 }
 
-// Update statistics cards
+// ================================
+// STATS (COVERAGE BASED ON CHANNEL)
+// ================================
 function updateStats(data) {
-  const totalMasters = data.length
+  const TOTAL_CHANNELS = 16
+  const TOTAL_SHIFTS = 3
+  const TOTAL_CHECKPOINTS = TOTAL_CHANNELS * TOTAL_SHIFTS // 48
+
   let okCount = 0
   let ngCount = 0
 
+  const checkpointSet = new Set()
+
   data.forEach((entry) => {
-    if (entry.Status === "OK") {
-      okCount++
-    } else {
-      ngCount++
-    }
+    const channel = entry.Channel
+    const shift = String(entry.Shift)
+
+    if (entry.Status === "OK") okCount++
+    else ngCount++
+
+    checkpointSet.add(`${channel}-shift-${shift}`)
   })
 
-  const okRate = totalMasters > 0 ? Math.round((okCount / totalMasters) * 100) : 0
-  const coverage = Math.round((totalMasters / 48) * 100)
+  const covered = checkpointSet.size
+  const coverage = Math.round((covered / TOTAL_CHECKPOINTS) * 100)
+  const totalEntries = data.length
+  const okRate =
+    totalEntries > 0 ? Math.round((okCount / totalEntries) * 100) : 0
 
-  document.getElementById("totalChecked").textContent = totalMasters
+  document.getElementById("totalChecked").textContent = totalEntries
   document.getElementById("mastersOk").textContent = okCount
-  document.getElementById("okRate").textContent = okRate
   document.getElementById("mastersNg").textContent = ngCount
   document.getElementById("ngCount").textContent = ngCount
+  document.getElementById("okRate").textContent = okRate
   document.getElementById("coverage").textContent = `${coverage}%`
-  document.getElementById("checkPoints").textContent = totalMasters
+  document.getElementById("checkPoints").textContent =
+    `${covered}/${TOTAL_CHECKPOINTS}`
 }
 
-// Update channel status table
+// ================================
+// CHANNEL TABLE
+// ================================
 function updateChannelTable(data) {
   const tableBody = document.getElementById("channelTable")
   tableBody.innerHTML = ""
 
-  // Create status map: channel -> shift -> {ok, ng}
   const statusMap = {}
 
   data.forEach((entry) => {
     const channel = entry.Channel
-    const shift = entry.Shift
+    const shift = String(entry.Shift)
     const status = entry.Status
 
-    if (!statusMap[channel]) {
-      statusMap[channel] = {}
-    }
-
-    if (!statusMap[channel][shift]) {
+    if (!statusMap[channel]) statusMap[channel] = {}
+    if (!statusMap[channel][shift])
       statusMap[channel][shift] = { ok: 0, ng: 0 }
-    }
 
-    if (status === "OK") {
-      statusMap[channel][shift].ok++
-    } else {
-      statusMap[channel][shift].ng++
-    }
+    status === "OK"
+      ? statusMap[channel][shift].ok++
+      : statusMap[channel][shift].ng++
   })
 
-  console.log("[v0] Status map:", statusMap)
-
-  // Generate table rows for 16 channels
-  for (let channel = 1; channel <= 16; channel++) {
-    const channelName = `Channel ${channel}`
+  for (let i = 1; i <= 16; i++) {
+    const channelName = `Channel ${i}`
     const row = document.createElement("tr")
+
     row.innerHTML = `
       <td><strong>${channelName}</strong></td>
       ${generateShiftCell(statusMap, channelName, "1")}
       ${generateShiftCell(statusMap, channelName, "2")}
       ${generateShiftCell(statusMap, channelName, "3")}
     `
+
     tableBody.appendChild(row)
   }
 }
 
-// Generate cell for shift status
-function generateShiftCell(statusMap, channel, shift) {
-  const channelData = statusMap[channel]
+function generateShiftCell(map, channel, shift) {
+  const data = map[channel]?.[shift]
 
-  if (!channelData || !channelData[shift]) {
+  if (!data) {
     return `<td><span class="status-indicator empty">-</span></td>`
   }
 
-  const shiftData = channelData[shift]
-
-  if (shiftData.ng > 0) {
-    return `<td><span class="status-indicator ng">${shiftData.ng}</span></td>`
-  } else {
-    return `<td><span class="status-indicator ok">✓</span></td>`
+  if (data.ng > 0) {
+    return `<td><span class="status-indicator ng">${data.ng}</span></td>`
   }
+
+  return `<td><span class="status-indicator ok">✓</span></td>`
 }
 
-// Update pie chart
+// ================================
+// CHART
+// ================================
 function updateChart(data) {
-  let okCount = 0
-  let ngCount = 0
+  let ok = 0
+  let ng = 0
 
-  data.forEach((entry) => {
-    if (entry.Status === "OK") {
-      okCount++
-    } else {
-      ngCount++
-    }
-  })
-
-  console.log("[v0] Chart data - OK:", okCount, "NG:", ngCount)
+  data.forEach((e) => (e.Status === "OK" ? ok++ : ng++))
 
   const ctx = document.getElementById("statusChart").getContext("2d")
 
-  // Destroy existing chart if exists
-  if (chartInstance) {
-    chartInstance.destroy()
-  }
+  if (chartInstance) chartInstance.destroy()
 
-  // Create new chart using vanilla Chart.js
-  chartInstance = new window.Chart(ctx, {
+  chartInstance = new Chart(ctx, {
     type: "doughnut",
     data: {
       labels: ["OK Masters", "NG Masters"],
       datasets: [
         {
-          data: [okCount, ngCount],
+          data: [ok, ng],
           backgroundColor: ["#10B981", "#EF4444"],
           borderWidth: 0,
         },
@@ -195,19 +181,15 @@ function updateChart(data) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
       plugins: {
-        legend: {
-          display: false,
-        },
+        legend: { display: false },
         tooltip: {
           callbacks: {
-            label: (context) => {
-              const label = context.label || ""
-              const value = context.parsed || 0
-              const total = context.dataset.data.reduce((a, b) => a + b, 0)
-              const percentage = total > 0 ? Math.round((value / total) * 100) : 0
-              return `${label}: ${value} (${percentage}%)`
+            label: (c) => {
+              const total = ok + ng
+              const pct =
+                total > 0 ? Math.round((c.parsed / total) * 100) : 0
+              return `${c.label}: ${c.parsed} (${pct}%)`
             },
           },
         },
