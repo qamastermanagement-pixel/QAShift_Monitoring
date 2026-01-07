@@ -407,7 +407,7 @@ const CHANNEL_MASTERS = {
                 { name: "SHSE - 2RS/2Z", code: "A12SH3" },
                 { name: "Augrease Mandril - OK", code: "A12Mn2" },
                 { name: "Augrease Mandril - NG", code: "A12Mn3" },
-                { name: "Augrease Mandril - Condirion d1;d2;d3", code: "A12Mn4" },
+                { name: "Augrease Mandril - condition d1;d2;d3", code: "A12Mn4" },
             ]
         },
         13: {
@@ -423,7 +423,7 @@ const CHANNEL_MASTERS = {
                 { name: "Mandril", code: "A12Mn1" },
                 { name: "Pairing OR", code: "A1PR1" },
                 { name: "Pairing IR", code: "A14PR2" },
-                { name: "Augrease Mandril - Condirion d1;d2;d3", code: "A13Mn4" },
+                { name: "Augrease Mandril - condition d1;d2;d3", code: "A13Mn4" },
             ]
         },
 
@@ -440,7 +440,7 @@ const CHANNEL_MASTERS = {
                 { name: "Mandril", code: "A12Mn1" },
                 { name: "Pairing OR", code: "A124R1" },
                 { name: "Pairing IR", code: "A124R2" },
-                { name: "Augrease Mandril - Condirion d1;d2;d3", code: "A14Mn4" },
+                { name: "Augrease Mandril - condition d1;d2;d3", code: "A14Mn4" },
             ],
                  "6203": [
                 { name: "OR Raceway Grinding de 1", code: "B14de1" },
@@ -454,7 +454,7 @@ const CHANNEL_MASTERS = {
                 { name: "Mandril", code: "B12Mn1" },
                 { name: "Pairing OR", code: "B124R1" },
                 { name: "Pairing IR", code: "B124R2" },
-                { name: "Augrease Mandril - Condirion d1;d2;d3", code: "B14Mn4" },
+                { name: "Augrease Mandril - condition d1;d2;d3", code: "B14Mn4" },
             ]
         },
 
