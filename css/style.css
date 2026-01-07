@@ -741,7 +741,7 @@ body {
 }
 
 .btn-submit {
-  background-color: var(--primary);
+  background-color: var(--primary-dark);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -749,8 +749,18 @@ body {
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center; /* teks ketengah */
+  width: auto; /* default desktop */
 }
+
+@media (max-width: 768px) {
+  .btn-submit {
+    width: 100%; /* biar full lebar di HP */
+  }
+}
+
 
 .btn-submit:hover {
   background-color: var(--primary-dark);
@@ -769,6 +779,7 @@ body {
   align-items: center;
   gap: 0.5rem;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  text-decoration: none; /* biar nggak underline */
 }
 
 .btn-back:hover {
