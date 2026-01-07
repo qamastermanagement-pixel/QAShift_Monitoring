@@ -797,16 +797,24 @@ body {
   margin-top: 2rem;
 }
 
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 768px) {
   .form-actions {
-    flex-direction: column; /* ubah dari row ke column */
-    align-items: stretch;   /* biar tombol full lebar */
+    flex-direction: column;   /* ubah jadi kolom di mobile */
+    align-items: stretch;     /* tombol full lebar */
   }
 
   .form-actions .btn-back,
   .form-actions .btn-submit,
   .form-actions .btn-dashboard {
     width: 100%;
-    justify-content: center; /* teks ketengah */
+    justify-content: center;  /* teks ketengah */
   }
 }
