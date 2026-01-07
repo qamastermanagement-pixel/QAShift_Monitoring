@@ -1603,12 +1603,12 @@ const CHANNEL_MASTERS = {  //TEST
 }
 
 const MASTER_CLEARANCE = [
-  { channel: "12", type: "6201", clearance: "Cn", location: "outside", code: "A12Cn1" },
-  { channel: "12", type: "6201", clearance: "C2", location: "outside", code: "A12C21" },
-  { channel: "12", type: "6201", clearance: "C3", location: "inside",  code: "A12C31" },
-  { channel: "12", type: "6201", clearance: "C3", location: "outside", code: "A12C31" },
-  { channel: "12", type: "6201", clearance: "C4", location: "outside", code: "A12C41" },
-  { channel: "12", type: "6201", clearance: "C5", location: "outside", code: "A12C51" }
+  { channel: "12", type: "6204", clearance: "Cn", location: "outside", code: "A12Cn1" },
+  { channel: "12", type: "6204", clearance: "C2", location: "outside", code: "A12C21" },
+  { channel: "12", type: "6204", clearance: "C3", location: "inside",  code: "A12C31" },
+  { channel: "12", type: "6204", clearance: "C3", location: "outside", code: "A12C31" },
+  { channel: "12", type: "6204", clearance: "C4", location: "outside", code: "A12C41" },
+  { channel: "12", type: "6204", clearance: "C5", location: "outside", code: "A12C51" }
 ];
 
 const CLEARANCE_ORDER = {
