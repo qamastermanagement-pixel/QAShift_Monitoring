@@ -1631,11 +1631,39 @@ function getUnderOverClearance(runningClearance) {
   };
 }
 
-console.log(getUnderOverClearance("C3"));
+console.log(getUnderOverClearance("C3")); //BUAT CEK AJA NANTI DIHAPIUSYA
+
+function getClearanceMasters(channel, type, clearance) {
+  return MASTER_CLEARANCE.filter(
+    m =>
+      m.channel === channel &&
+      m.type === type &&
+      m.clearance === clearance
+  );
+}
+
+function buildClearanceMasters(channel, type, runningClearance) {
+  const { under, over } = getUnderOverClearance(runningClearance);
+
+  return [
+    ...getClearanceMasters(channel, type, under).map(m => ({
+      name: `Clearance UNDER (${under})`,
+      code: m.code
+    })),
+    ...getClearanceMasters(channel, type, runningClearance).map(m => ({
+      name: `Clearance RUNNING (${runningClearance})`,
+      code: m.code
+    })),
+    ...getClearanceMasters(channel, type, over).map(m => ({
+      name: `Clearance OVER (${over})`,
+      code: m.code
+    }))
+  ];
+}
 
 
 
-// form.js
+// form.js DOMLOADED
 document.addEventListener("DOMContentLoaded", () => {
     console.log("[v0] Form.js loaded")
 
@@ -1674,6 +1702,23 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     });
+
+    // ===== CLEARANCE RUNNING LISTENER (BARU) =====
+    const runningSelect = document.getElementById("runningClearance");
+
+    if (runningSelect) {
+        runningSelect.addEventListener("change", function () {
+            const running = this.value;
+            if (!running) return;
+
+        const channel = sessionStorage.getItem("channel") || "12";
+        const type = sessionStorage.getItem("bearingType") || "6201";
+
+        const clearanceMasters = buildClearanceMasters(channel, type, running);
+        console.log("CLEARANCE AS MASTER:", clearanceMasters);
+    });
+}
+
 })
 
 // Go to step 2 (master check)
