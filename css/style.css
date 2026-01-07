@@ -442,8 +442,9 @@ body {
 }
 
 .form-actions {
-  display: flex;
-  gap: 1rem;
+  display: flex; 
+  justify-content: center; /* ini yang bikin tombol ke tengah */ 
+  gap: 1rem; 
   margin-top: 2rem;
 }
 
@@ -712,7 +713,7 @@ body {
   }
 
   .form-actions {
-    flex-direction: column;
+    flex-direction: row;  /*ubah bentar ke row, aslinya column*/
   }
 
   .charts-grid {
@@ -739,3 +740,37 @@ body {
   color: white;            /* saat hover baru berubah */
 }
 
+.btn-submit {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn-submit:hover {
+  background-color: var(--primary-dark);
+}
+.btn-back {
+  background-color: white;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.btn-back:hover {
+  background-color: var(--primary);
+  color: white;
+}
