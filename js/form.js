@@ -1753,8 +1753,16 @@ function goToStep2() {
     document.getElementById("selectedChannel").textContent = channel;
 
     // Get masters for selected channel & type
-    const masters = CHANNEL_MASTERS[channel]?.[bearingType]?.[category];
+    let masters;
+
+    if (category === "Pokayoke") {
+        masters = buildClearanceMasters(channel, bearingType, runningClearance);
+    } else {
+        masters = CHANNEL_MASTERS[channel]?.[bearingType]?.[category];
+    }
+
     console.log("[v0] Masters for channel", channel, ":", masters);
+
 
     if (!masters || !Array.isArray(masters)) {
         alert(`Data master untuk channel ${channel}, tipe ${bearingType}, kategori ${category} tidak ditemukan!`); 
