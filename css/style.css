@@ -765,12 +765,34 @@ body {
   font-size: 1rem;
   cursor: pointer;
   display: inline-flex;
+  justify-content: center;
   align-items: center;
   gap: 0.5rem;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 .btn-back:hover {
-  background-color: var(--primary);
+  background-color: var(--primary-dark);
   color: white;
+}
+
+.btn-dashboard {
+  background-color: var(--primary-dark);
+  color: white;
+  border: 2px solid var(--primary-dark);
+  padding: 0.75rem 1.5rem;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none; /* biar nggak underline */
+}
+
+.center-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
 }
