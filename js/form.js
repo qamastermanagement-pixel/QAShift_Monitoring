@@ -1,7 +1,7 @@
 // Data master per channel (HARDCODED - tidak perlu Google Sheets)
 const CHANNEL_MASTERS = {
     1: {
-        "6504": [
+        "6202": [
             { name: "IR Bore Grinding ", code: "A01de1" },
             { name: "OD Check", code: "A01de2" },
             { name: "Bore Check", code: "A01Di1" },
@@ -16,7 +16,7 @@ const CHANNEL_MASTERS = {
             { name: "Auto OD", code: "A01dm1" },
             { name: "Bore Check & Bore Check", code: "A01AI1" },
         ],
-        "8876": [
+        "6300": [
             { name: "IR Bore Grinding ", code: "A01de1" },
             { name: "OD Check", code: "A01de2" },
             { name: "Bore Check", code: "A01Di1" },
@@ -34,7 +34,7 @@ const CHANNEL_MASTERS = {
     },
 
     2: {
-        "2234": [
+        "6206": [
             { name: "IR Bore Grinding", code: "A02de1" },
             { name: "OD Check", code: "A02de2" },
             { name: "Bore Check", code: "A02Di1" },
@@ -49,7 +49,7 @@ const CHANNEL_MASTERS = {
             { name: "Auto OD", code: "A02dm1" },
             { name: "Bore Check & Bore Check", code: "A02AI1" },
         ],
-        "2235": [
+        "6207": [
             { name: "IR Bore Grinding", code: "A02de1" },
             { name: "OD Check", code: "A02de2" },
             { name: "Bore Check", code: "A02Di1" },
@@ -67,7 +67,7 @@ const CHANNEL_MASTERS = {
     },
 
     3: {
-        "4455": [
+        "6004": [
             { name: "IR Bore Grinding", code: "A03de1" },
             { name: "OD Check", code: "A03de2" },
             { name: "Bore Check", code: "A03Di1" },
@@ -82,7 +82,7 @@ const CHANNEL_MASTERS = {
             { name: "Auto OD", code: "A03dm1" },
             { name: "Bore Check & Bore Check", code: "A03AI1" },
         ],
-        "7788": [
+        "6203": [
             { name: "IR Bore Grinding", code: "A03de1" },
             { name: "OD Check", code: "A03de2" },
             { name: "Bore Check", code: "A03Di1" },
@@ -100,7 +100,7 @@ const CHANNEL_MASTERS = {
     },
 
     4: {
-        "7766": [
+        "6204": [
             { name: "IR Bore Grinding", code: "A04de1" },
             { name: "OD Check", code: "A04de2" },
             { name: "Bore Check", code: "A04Di1" },
@@ -115,7 +115,7 @@ const CHANNEL_MASTERS = {
             { name: "Auto OD", code: "A04dm1" },
             { name: "Bore Check & Bore Check", code: "A04AI1" },
         ],
-        "8877": [
+        "0696": [
             { name: "IR Bore Grinding", code: "A04de1" },
             { name: "OD Check", code: "A04de2" },
             { name: "Bore Check", code: "A04Di1" },
@@ -133,7 +133,7 @@ const CHANNEL_MASTERS = {
     },
 
     5: {
-        "5544": [
+        "6001": [
             { name: "IR Bore Grinding", code: "A05de1" },
             { name: "OD Check", code: "A05de2" },
             { name: "Bore Check", code: "A05Di1" },
@@ -148,7 +148,7 @@ const CHANNEL_MASTERS = {
             { name: "Auto OD", code: "A05dm1" },
             { name: "Bore Check & Bore Check", code: "A05AI1" },
         ],
-        "6766": [
+        "6003": [
             { name: "IR Bore Grinding", code: "A05de1" },
             { name: "OD Check", code: "A05de2" },
             { name: "Bore Check", code: "A05Di1" },
@@ -166,7 +166,7 @@ const CHANNEL_MASTERS = {
     },
 
     6: {
-        "44455": [
+        "6002": [
             { name: "IR Bore Grinding", code: "A06de1" },
             { name: "OD Check", code: "A06de2" },
             { name: "Bore Check", code: "A06Di1" },
@@ -181,7 +181,7 @@ const CHANNEL_MASTERS = {
             { name: "Auto OD", code: "A06dm1" },
             { name: "Bore Check & Bore Check", code: "A06AI1" },
         ],
-        "ee12": [
+        "6905": [
             { name: "IR Bore Grinding", code: "A06de1" },
             { name: "OD Check", code: "A06de2" },
             { name: "Bore Check", code: "A06Di1" },
@@ -199,7 +199,7 @@ const CHANNEL_MASTERS = {
     },
 
     7: {
-        "8876": [
+        "6301": [
             { name: "IR Bore Grinding", code: "A07de1" },
             { name: "OD Check", code: "A07de2" },
             { name: "Bore Check", code: "A07Di1" },
@@ -214,7 +214,7 @@ const CHANNEL_MASTERS = {
             { name: "Auto OD", code: "A07dm1" },
             { name: "Bore Check & Bore Check", code: "A07AI1" },
         ],
-        "3903": [
+        "0838": [
             { name: "IR Bore Grinding", code: "A07de1" },
             { name: "OD Check", code: "A07de2" },
             { name: "Bore Check", code: "A07Di1" },
@@ -232,7 +232,7 @@ const CHANNEL_MASTERS = {
     },
 
     8: {
-        "6773": [
+        "6205": [
             { name: "IR Bore Grinding", code: "A08de1" },
             { name: "OD Check", code: "A08de2" },
             { name: "Bore Check", code: "A08Di1" },
@@ -247,7 +247,7 @@ const CHANNEL_MASTERS = {
             { name: "Auto OD", code: "A08dm1" },
             { name: "Bore Check & Bore Check", code: "A08AI1" },
         ],
-        "9987": [
+        "6203": [
             { name: "IR Bore Grinding", code: "A08de1" },
             { name: "OD Check", code: "A08de2" },
             { name: "Bore Check", code: "A08Di1" },
@@ -264,7 +264,7 @@ const CHANNEL_MASTERS = {
         ]
     },
     9: {
-        "99887": [
+        "3260": [
             { name: "IR Bore Grinding", code: "A09de1" },
             { name: "OD Check", code: "A09de2" },
             { name: "Bore Check", code: "A09Di1" },
@@ -279,7 +279,7 @@ const CHANNEL_MASTERS = {
             { name: "Auto OD", code: "A09dm1" },
             { name: "Bore Check & Bore Check", code: "A09AI1" },
         ],
-        "6674": [
+        "4756": [
             { name: "IR Bore Grinding", code: "A09de1" },
             { name: "OD Check", code: "A09de2" },
             { name: "Bore Check", code: "A09Di1" },
@@ -296,7 +296,7 @@ const CHANNEL_MASTERS = {
         ],
     },
         10: {
-            "0098": [
+            "6201": [
                 { name: "IR Bore Grinding", code: "A10de1" },
                 { name: "OD Check", code: "A10de2" },
                 { name: "Bore Check", code: "A10Di1" },
@@ -311,7 +311,7 @@ const CHANNEL_MASTERS = {
                 { name: "Auto OD", code: "A10dm1" },
                 { name: "Bore Check & Bore Check", code: "A10AI1" },
             ],
-            "2282": [
+            "0697": [
                 { name: "IR Bore Grinding", code: "A10de1" },
                 { name: "OD Check", code: "A10de2" },
                 { name: "Bore Check", code: "A10Di1" },
@@ -329,7 +329,7 @@ const CHANNEL_MASTERS = {
         },
 
         11: {
-            "6654": [
+            "6302": [
                 { name: "IR Bore Grinding", code: "A11de1" },
                 { name: "OD Check", code: "A11de2" },
                 { name: "Bore Check", code: "A11Di1" },
@@ -344,7 +344,7 @@ const CHANNEL_MASTERS = {
                 { name: "Auto OD", code: "A11dm1" },
                 { name: "Bore Check & Bore Check", code: "A11AI1" },
             ],
-            "4343": [
+            "0839": [
                 { name: "IR Bore Grinding", code: "A11de1" },
                 { name: "OD Check", code: "A11de2" },
                 { name: "Bore Check", code: "A11Di1" },
@@ -411,7 +411,7 @@ const CHANNEL_MASTERS = {
             ]
         },
         13: {
-            "6002": [
+            "6001": [
                 { name: "OR Raceway Grinding", code: "A13de1" },
                 { name: "OR Raceway Grinding", code: "A13de2" },
                 { name: "IR Raceway Grinding", code: "A13Di1" },
@@ -481,9 +481,54 @@ const CHANNEL_MASTERS = {
                 { name: "Auto OD", code: "A14dm1" },
                 { name: "Bore Check & Bore Check", code: "A14AI1" },
             ]
+            "6203": [
+                { name: "IR Bore Grinding ", code: "V14de1" },
+                { name: "OD Check", code: "B14de2" },
+                { name: "Bore Check", code: "B14Di1" },
+                { name: "Pairing & Ball Filling", code: "B14Di2" },
+                { name: "Cage Pressing", code: "B14Dk1" },
+                { name: "Free Run Test", code: "B14do1" },
+                { name: "Demagtizer", code: "B14do2" },
+                { name: "Washing", code: "B14AO1" },
+                { name: "MVM For Vibration test", code: "B14AO2" },
+                { name: "Radial Clearance Check", code: "B14AO3" },
+                { name: "PY SHSE", code: "B14AO4" },
+                { name: "Auto OD", code: "B14dm1" },
+                { name: "Bore Check & Bore Check", code: "B14AI1" },
+            ]
         },
         15: {
-            "4646": [
+            "0256": [
+                { name: "IR Bore Grinding ", code: "A15de1" },
+                { name: "OD Check", code: "A15de2" },
+                { name: "Bore Check", code: "A15Di1" },
+                { name: "Pairing & Ball Filling", code: "A15Di2" },
+                { name: "Cage Pressing", code: "A15Dk1" },
+                { name: "Free Run Test", code: "A15do1" },
+                { name: "Demagtizer", code: "A15do2" },
+                { name: "Washing", code: "A15AO1" },
+                { name: "MVM For Vibration test", code: "A15AO2" },
+                { name: "Radial Clearance Check", code: "A15AO3" },
+                { name: "PY SHSE", code: "A15AO4" },
+                { name: "Auto OD", code: "A15dm1" },
+                { name: "Bore Check & Bore Check", code: "A15AI1" },
+            ]
+             "0285": [
+                { name: "IR Bore Grinding ", code: "A15de1" },
+                { name: "OD Check", code: "A15de2" },
+                { name: "Bore Check", code: "A15Di1" },
+                { name: "Pairing & Ball Filling", code: "A15Di2" },
+                { name: "Cage Pressing", code: "A15Dk1" },
+                { name: "Free Run Test", code: "A15do1" },
+                { name: "Demagtizer", code: "A15do2" },
+                { name: "Washing", code: "A15AO1" },
+                { name: "MVM For Vibration test", code: "A15AO2" },
+                { name: "Radial Clearance Check", code: "A15AO3" },
+                { name: "PY SHSE", code: "A15AO4" },
+                { name: "Auto OD", code: "A15dm1" },
+                { name: "Bore Check & Bore Check", code: "A15AI1" },
+            ]
+             "0286": [
                 { name: "IR Bore Grinding ", code: "A15de1" },
                 { name: "OD Check", code: "A15de2" },
                 { name: "Bore Check", code: "A15Di1" },
@@ -500,7 +545,7 @@ const CHANNEL_MASTERS = {
             ]
         },
         16: {
-            "6654": [
+            "test999": [
             { name: "IR Bore Grinding ", code: "A16de1" },
             { name: "OD Check", code: "A16de2" },
             { name: "Bore Check", code: "A16Di1" },
