@@ -1703,22 +1703,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ===== CLEARANCE RUNNING LISTENER (BARU) =====
-    const runningSelect = document.getElementById("runningClearance");
-
-    if (runningSelect) {
-        runningSelect.addEventListener("change", function () {
-            const running = this.value;
-            if (!running) return;
-
-        const channel = sessionStorage.getItem("channel") || "12";
-        const type = sessionStorage.getItem("bearingType") || "6201";
-
-        const clearanceMasters = buildClearanceMasters(channel, type, running);
-        console.log("CLEARANCE AS MASTER:", clearanceMasters);
-    });
-}
-
 })
 
 // Go to step 2 (master check)
@@ -1748,6 +1732,7 @@ function goToStep2() {
     sessionStorage.setItem("channel", channel);
     sessionStorage.setItem("bearingType", bearingType);
     sessionStorage.setItem("category", category);
+    
 
     // Display selected channel info
     document.getElementById("selectedChannel").textContent = channel;
