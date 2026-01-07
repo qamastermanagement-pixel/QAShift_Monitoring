@@ -147,6 +147,22 @@
                 </div>
 
                 <form id="masterCheckForm">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Clearance yang sedang running
+                        </label>
+                        <select id="runningClearance" class="form-select">
+                            <option value="">-- Pilih Clearance --</option>
+                            <option value="C2">C2</option>
+                            <option value="Cn">Cn</option>
+                            <option value="C3">C3</option>
+                            <option value="C4">C4</option>
+                            <option value="C5">C5</option>
+                        </select>
+                    </div>
+
+                    <div id="clearanceResult" class="form-group"></div>
+
                     <div id="masterList"></div>
 
                     <div class="form-actions">
@@ -158,6 +174,7 @@
                             Dashboard <span style="font-size: 1.25rem;">→</span>
                         </a>    
                     </div>
+                    
                 </form>
             </div>
         </div>
