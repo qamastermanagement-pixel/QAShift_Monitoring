@@ -720,3 +720,15 @@ body {
   max-height: 280px;  /* batas tinggi */
   margin: 0 auto;     /* center */
 }
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--primary);   /* ganti ke warna kontras, misalnya biru */
+  border: 2px solid var(--primary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary);
+  color: white;            /* saat hover baru berubah */
+}
+
