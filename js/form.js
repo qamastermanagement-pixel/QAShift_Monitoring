@@ -455,7 +455,7 @@ const CHANNEL_MASTERS = {
                 { name: "Pairing OR", code: "B124R1" },
                 { name: "Pairing IR", code: "B124R2" },
                 { name: "Augrease Mandril - Condirion d1;d2;d3", code: "B14Mn4" },
-            ],
+            ]
         },
 
         15: {
@@ -520,7 +520,7 @@ const CHANNEL_MASTERS = {
             { name: "PY SHSE", code: "A16AO4" },
             { name: "Auto OD", code: "A16dm1" },
             { name: "Bore Check & Bore Check", code: "A16AI1" },
-        ],
+        ]
     }
     }
 
