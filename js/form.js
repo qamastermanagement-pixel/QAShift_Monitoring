@@ -1602,6 +1602,39 @@ const CHANNEL_MASTERS = {
     },
 }
 
+const MASTER_CLEARANCE = [
+  { channel: "12", type: "6201", clearance: "Cn", location: "outside", code: "A12Cn1" },
+  { channel: "12", type: "6201", clearance: "C2", location: "outside", code: "A12C21" },
+  { channel: "12", type: "6201", clearance: "C3", location: "inside",  code: "A12C31" },
+  { channel: "12", type: "6201", clearance: "C3", location: "outside", code: "A12C31" },
+  { channel: "12", type: "6201", clearance: "C4", location: "outside", code: "A12C41" },
+  { channel: "12", type: "6201", clearance: "C5", location: "outside", code: "A12C51" }
+];
+
+const CLEARANCE_ORDER = {
+  C2: 1,
+  Cn: 2,
+  C3: 3,
+  C4: 4,
+  C5: 5
+};
+
+function getUnderOverClearance(runningClearance) {
+  const currentOrder = CLEARANCE_ORDER[runningClearance];
+
+  return {
+    under: Object.keys(CLEARANCE_ORDER)
+      .filter(c => CLEARANCE_ORDER[c] === currentOrder - 1)[0] || null,
+
+    over: Object.keys(CLEARANCE_ORDER)
+      .filter(c => CLEARANCE_ORDER[c] === currentOrder + 1)[0] || null
+  };
+}
+
+console.log(getUnderOverClearance("C3"));
+
+
+
 // form.js
 document.addEventListener("DOMContentLoaded", () => {
     console.log("[v0] Form.js loaded")
