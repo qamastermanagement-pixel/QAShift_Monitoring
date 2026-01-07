@@ -796,3 +796,17 @@ body {
   justify-content: center;
   margin-top: 2rem;
 }
+
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column; /* ubah dari row ke column */
+    align-items: stretch;   /* biar tombol full lebar */
+  }
+
+  .form-actions .btn-back,
+  .form-actions .btn-submit,
+  .form-actions .btn-dashboard {
+    width: 100%;
+    justify-content: center; /* teks ketengah */
+  }
+}
