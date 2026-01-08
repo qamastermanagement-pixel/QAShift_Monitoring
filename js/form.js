@@ -1888,6 +1888,7 @@ async function submitData() {
         npk: sessionStorage.getItem("npk"),
         channel: `Channel ${channel}`,
         bearingType: bearingType,
+        category: sessionStorage.getItem("category"),
         masters: masterResults,
     }
 
