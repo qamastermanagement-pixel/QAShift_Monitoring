@@ -61,6 +61,8 @@ function filterAndDisplayData() {
   updateStats(filteredData)
   updateChannelTable(filteredData)
   updateChart(filteredData)
+  updateNumericRemarkTable(filteredData)
+
 }
 
 // ================================
@@ -196,4 +198,34 @@ function updateChart(data) {
       },
     },
   })
+}
+
+function updateNumericRemarkTable(data) {
+  const tbody = document.getElementById("remarkTableBody");
+  tbody.innerHTML = "";
+
+  // Filter hanya NG dengan remark numerik
+  const numericRemarks = data.filter(entry => {
+    if (entry.Status !== "NG" || !entry.Remark) return false;
+    const remark = String(entry.Remark).trim();
+    const numericRegex = /^[-+]?\d*\.?\d+$/; // Hanya angka (boleh +, -, desimal)
+    return numericRegex.test(remark);
+  });
+
+  if (numericRemarks.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center">Tidak ada NG dengan remark numerik</td></tr>`;
+    return;
+  }
+
+  numericRemarks.forEach(entry => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${entry.Tanggal}</td>
+      <td>${entry.Channel}</td>
+      <td>${entry.Shift}</td>
+      <td>${entry.Master}</td>
+      <td><strong>${entry.Remark}</strong></td>
+    `;
+    tbody.appendChild(row);
+  });
 }
