@@ -1,5 +1,5 @@
 // Data master per channel (HARDCODED - tidak perlu Google Sheets)
-const CHANNEL_MASTERS = { //TEST
+const CHANNEL_MASTERS = {
     1: {
         "6202": {
             gauging: [
@@ -1602,68 +1602,7 @@ const CHANNEL_MASTERS = { //TEST
     },
 }
 
-const MASTER_CLEARANCE = [
-  { channel: "12", type: "6204", clearance: "Cn", location: "outside", code: "A12Cn1" },
-  { channel: "12", type: "6204", clearance: "C2", location: "outside", code: "A12C21" },
-  { channel: "12", type: "6204", clearance: "C3", location: "inside",  code: "A12C31" },
-  { channel: "12", type: "6204", clearance: "C3", location: "outside", code: "A12C31" },
-  { channel: "12", type: "6204", clearance: "C4", location: "outside", code: "A12C41" },
-  { channel: "12", type: "6204", clearance: "C5", location: "outside", code: "A12C51" }
-];
-
-const CLEARANCE_ORDER = {
-  C2: 1,
-  Cn: 2,
-  C3: 3,
-  C4: 4,
-  C5: 5
-};
-
-function getUnderOverClearance(runningClearance) {
-  const currentOrder = CLEARANCE_ORDER[runningClearance];
-
-  return {
-    under: Object.keys(CLEARANCE_ORDER)
-      .filter(c => CLEARANCE_ORDER[c] === currentOrder - 1)[0] || null,
-
-    over: Object.keys(CLEARANCE_ORDER)
-      .filter(c => CLEARANCE_ORDER[c] === currentOrder + 1)[0] || null
-  };
-}
-
-console.log(getUnderOverClearance("C3")); //BUAT CEK AJA NANTI DIHAPIUSYA
-
-function getClearanceMasters(channel, type, clearance) {
-  return MASTER_CLEARANCE.filter(
-    m =>
-      m.channel === channel &&
-      m.type === type &&
-      m.clearance === clearance
-  );
-}
-
-function buildClearanceMasters(channel, type, runningClearance) {
-  const { under, over } = getUnderOverClearance(runningClearance);
-
-  return [
-    ...getClearanceMasters(channel, type, under).map(m => ({
-      name: `Clearance UNDER (${under})`,
-      code: m.code
-    })),
-    ...getClearanceMasters(channel, type, runningClearance).map(m => ({
-      name: `Clearance RUNNING (${runningClearance})`,
-      code: m.code
-    })),
-    ...getClearanceMasters(channel, type, over).map(m => ({
-      name: `Clearance OVER (${over})`,
-      code: m.code
-    }))
-  ];
-}
-
-
-
-// form.js DOMLOADED
+// form.js
 document.addEventListener("DOMContentLoaded", () => {
     console.log("[v0] Form.js loaded")
 
@@ -1702,7 +1641,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     });
-
 })
 
 // Go to step 2 (master check)
@@ -1716,8 +1654,6 @@ function goToStep2() {
     const bearingType = document.getElementById("bearingType").value;
     const category = document.getElementById("category").value;
 
-    const runningClearance = "C3"; //SMENTARA
-   
     console.log("[v0] Form values:", { tanggal, shift, npk, channel, bearingType, category });
 
     if (!tanggal || !shift || !npk || !channel || !bearingType || !category) {
@@ -1732,22 +1668,13 @@ function goToStep2() {
     sessionStorage.setItem("channel", channel);
     sessionStorage.setItem("bearingType", bearingType);
     sessionStorage.setItem("category", category);
-    
 
     // Display selected channel info
     document.getElementById("selectedChannel").textContent = channel;
 
     // Get masters for selected channel & type
-    let masters;
-
-    if (category === "Pokayoke") {
-        masters = buildClearanceMasters(channel, bearingType, runningClearance);
-    } else {
-        masters = CHANNEL_MASTERS[channel]?.[bearingType]?.[category];
-    }
-
+    const masters = CHANNEL_MASTERS[channel]?.[bearingType]?.[category];
     console.log("[v0] Masters for channel", channel, ":", masters);
-
 
     if (!masters || !Array.isArray(masters)) {
         alert(`Data master untuk channel ${channel}, tipe ${bearingType}, kategori ${category} tidak ditemukan!`); 
