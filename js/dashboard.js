@@ -221,6 +221,7 @@ function updateNGTrackerTable(data) {
       <td>${entry.Master}</td>
       <td>${entry.Remark || ""}</td>
       <td>${entry.Kategori || "-"}</td>
+      <td>${entry.Code || "-"}</td>
     `;
     tbody.appendChild(row);
   });
