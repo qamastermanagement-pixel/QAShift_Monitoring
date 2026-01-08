@@ -1782,7 +1782,7 @@ function goToStep2() {
             </div>
             <div class="remark-field" id="remark-${index}">
                 <label class="form-label">Remarks <span class="required">*</span></label>
-                <textarea class="remark-textarea" id="remark-text-${index}" placeholder="Tuliskan keterangan untuk status NG..."></textarea>
+                <textarea class="remark-textarea" id="remark-text-${index}" placeholder="Remark hanya boleh diisi jika ada perubahan nilai numerik pada master"></textarea>
             </div>
         `;
         masterList.appendChild(masterItem);
@@ -1863,13 +1863,21 @@ async function submitData() {
 
         let remark = ""
         if (status === "NG") {
-            remark = document.getElementById(`remark-text-${i}`).value.trim()
-            if (!remark) {
-                const masterDisplay = typeof masters[i] === "string" ? masters[i] : `${masters[i].name} (${masters[i].code})`
-                alert(`Mohon isi remark untuk ${masterDisplay} yang berstatus NG`)
-                return
+            remark = document.getElementById(`remark-text-${i}`).value.trim();
+
+            // Jika ada isi, cek apakah hanya angka (boleh +, -, .)
+            if (remark !== "") {
+            // Regex untuk angka numerik (boleh negatif, positif, desimal)
+            const numericRegex = /^[-+]?\d*\.?\d+$/;
+
+            if (!numericRegex.test(remark)) {
+               const masterDisplay = typeof masters[i] === "string" ? masters[i] : `${masters[i].name} (${masters[i].code})`;
+                alert(`Remark untuk ${masterDisplay} hanya boleh berupa angka (misal: 0, -1, +3, +0.5). Tidak boleh teks seperti "missing" atau "patah".`);
+                return;
             }
         }
+    }
+
 
         const masterData = { name: masters[i].name, code: masters[i].code };
 
