@@ -119,10 +119,25 @@
                             <option value="">Pilih Kategori</option>
                             <option value="gauging">Gauging</option>
                             <option value="Pokayoke">Pokayoke</option>
+                            <option value="Clearance">Clearance</option>
                         </select>
                         <p class="helper-text">Kategori harus dipilih</p>
                     </div> 
                     
+                    <!-- Tambahkan ini DI BAWAH field Kategori -->
+                    <div id="clearanceField" class="form-group" style="display: none;">
+                        <label for="clearanceType" class="form-label">Tipe Clearance yang Sedang Running? <span class="required">*</span></label>
+                        <select id="clearanceType" class="form-select">
+                            <option value="">--Pilih Tipe Clearance--</option>
+                            <option value="C2">C2</option>
+                            <option value="Cn">Cn</option>
+                            <option value="C3">C3</option>
+                            <option value="C4">C4</option>
+                            <option value="C5">C5</option>
+                        </select>
+                        <p class="helper-text">Pilih tipe clearance yang sedang dijalankan</p>
+                    </div>  
+
                     <div class="center-button">
                         <button type="submit" class="btn-back">
                             Lanjutkan ke Data Pemeriksaan <span style="font-size: 1.25rem;">→</span>
