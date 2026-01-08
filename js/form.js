@@ -1732,9 +1732,19 @@ function goToStep2() {
         if (idx < order.length - 1 && map[order[idx + 1]]) masters.push(map[order[idx + 1]]);
 
     } else {
-        // Kategori biasa
-        masters = CHANNEL_MASTERS[channel]?.[bearingType]?.[category];
+    // Kategori biasa
+    let rawMasters = CHANNEL_MASTERS[channel]?.[bearingType]?.[category];
+    if (!rawMasters || !Array.isArray(rawMasters)) {
+        masters = [];
+    } else if (category === "Pokayoke") {
+        // 🔥 FILTER: HILANGKAN SEMUA "Clearance Check"
+        masters = rawMasters.filter(item =>
+            !/Clearance Check - (C2|Cn|C3|C4|C5)/.test(item.name)
+        );
+    } else {
+        masters = rawMasters;
     }
+}
 
     if (!masters || !Array.isArray(masters) || masters.length === 0) {
         alert(`Data master tidak ditemukan untuk kategori ${category}!`);
