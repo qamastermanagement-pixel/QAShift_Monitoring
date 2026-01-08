@@ -1831,7 +1831,7 @@ function selectStatus(index, status) {
 async function submitData() {
     const channel = sessionStorage.getItem("channel");
     const bearingType = sessionStorage.getItem("bearingType");
-    // const category = sessionStorage.getItem("category"); // Tidak dipakai lagi
+    const category = sessionStorage.getItem("category"); // Tidak dipakai lagi
 
     // 🔥 Ambil master yang ditampilkan di UI
     const masters = JSON.parse(sessionStorage.getItem("displayedMasters"));
