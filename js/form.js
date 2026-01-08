@@ -1788,6 +1788,9 @@ function goToStep2() {
         masterList.appendChild(masterItem);
     });
 
+    // Simpan daftar master yang ditampilkan (termasuk hasil filter Clearance)
+    sessionStorage.setItem("displayedMasters", JSON.stringify(masters));
+
     // Switch to step 2
     document.getElementById("step1").classList.remove("active");
     document.getElementById("step2").classList.add("active");
@@ -1826,10 +1829,16 @@ function selectStatus(index, status) {
 }
 
 async function submitData() {
-    const channel = sessionStorage.getItem("channel")
-    const bearingType = sessionStorage.getItem("bearingType")
-    const category = sessionStorage.getItem("category")
-    const masters = CHANNEL_MASTERS[channel][bearingType][category]
+    const channel = sessionStorage.getItem("channel");
+    const bearingType = sessionStorage.getItem("bearingType");
+    // const category = sessionStorage.getItem("category"); // Tidak dipakai lagi
+
+    // 🔥 Ambil master yang ditampilkan di UI
+    const masters = JSON.parse(sessionStorage.getItem("displayedMasters"));
+    if (!masters || !Array.isArray(masters)) {
+        alert("Data master tidak valid. Silakan ulangi.");
+        return;
+    }
 
     console.log("[v0] Submitting data...")
     const appsScriptUrl = window.CONFIG
