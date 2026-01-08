@@ -1624,7 +1624,7 @@ document.addEventListener("DOMContentLoaded", () => {
         submitData()
     })
 
-    //Script populate bearingType
+    // Script populate bearingType
     document.getElementById("channel").addEventListener("change", function () {
         const channel = this.value;
         const bearingSelect = document.getElementById("bearingType");
@@ -1641,7 +1641,21 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     });
-})
+
+    // CATEGORY NEW
+    document.getElementById("category").addEventListener("change", function () {
+        const field = document.getElementById("clearanceField");
+        if (this.value === "Clearance") {
+            field.style.display = "block";
+        } else {
+            field.style.display = "none";
+            document.getElementById("clearanceType").value = "";
+        }
+    });
+
+}); // END DARI DOMContentLoaded
+
+ 
 
 // Go to step 2 (master check)
 function goToStep2() {
@@ -1654,79 +1668,120 @@ function goToStep2() {
     const bearingType = document.getElementById("bearingType").value;
     const category = document.getElementById("category").value;
 
-    console.log("[v0] Form values:", { tanggal, shift, npk, channel, bearingType, category });
+    // --- Tambahkan: field clearanceType jika dipilih ---
+    let clearanceType = "";
+    if (category === "Clearance") {
+        clearanceType = document.getElementById("clearanceType")?.value;
+        if (!clearanceType) {
+            alert("Pilih tipe clearance yang sedang running!");
+            return;
+        }
+    }
 
     if (!tanggal || !shift || !npk || !channel || !bearingType || !category) {
         alert("Semua field harus diisi!");
         return;
     }
 
-    // Store basic info in sessionStorage
+    // --- Simpan ke sessionStorage ---
     sessionStorage.setItem("tanggal", tanggal);
     sessionStorage.setItem("shift", shift);
     sessionStorage.setItem("npk", npk);
     sessionStorage.setItem("channel", channel);
     sessionStorage.setItem("bearingType", bearingType);
-    sessionStorage.setItem("category", category);
+    // ✅ PENTING: Simpan kategori asli sebagai "Pokayoke" jika pilih Clearance
+    const actualCategory = (category === "Clearance") ? "Pokayoke" : category;
+    sessionStorage.setItem("category", actualCategory);
 
     // Display selected channel info
     document.getElementById("selectedChannel").textContent = channel;
 
-    // Get masters for selected channel & type
-    const masters = CHANNEL_MASTERS[channel]?.[bearingType]?.[category];
-    console.log("[v0] Masters for channel", channel, ":", masters);
+    // --- Ambil data master ---
+    let masters;
 
-    if (!masters || !Array.isArray(masters)) {
-        alert(`Data master untuk channel ${channel}, tipe ${bearingType}, kategori ${category} tidak ditemukan!`); 
-        return; 
+    if (category === "Clearance") {
+        // Ambil dari Pokayoke
+        const pokayokeMasters = CHANNEL_MASTERS[channel]?.[bearingType]?.["Pokayoke"];
+        if (!pokayokeMasters || !Array.isArray(pokayokeMasters)) {
+            alert("Data Pokayoke tidak ditemukan!");
+            return;
+        }
+
+        // Filter hanya clearance
+        const clearanceItems = pokayokeMasters.filter(item =>
+            /Clearance Check - (C2|Cn|C3|C4|C5)/.test(item.name)
+        );
+
+        // Mapping
+        const map = {};
+        clearanceItems.forEach(item => {
+            const match = item.name.match(/Clearance Check - (C2|Cn|C3|C4|C5)/);
+            if (match) map[match[1]] = item;
+        });
+
+        const order = ["C2", "Cn", "C3", "C4", "C5"];
+        const idx = order.indexOf(clearanceType);
+        if (idx === -1) {
+            alert("Tipe clearance tidak valid!");
+            return;
+        }
+
+        masters = [];
+        if (idx > 0 && map[order[idx - 1]]) masters.push(map[order[idx - 1]]);
+        if (map[clearanceType]) masters.push(map[clearanceType]);
+        if (idx < order.length - 1 && map[order[idx + 1]]) masters.push(map[order[idx + 1]]);
+
+    } else {
+        // Kategori biasa
+        masters = CHANNEL_MASTERS[channel]?.[bearingType]?.[category];
+    }
+
+    if (!masters || !Array.isArray(masters) || masters.length === 0) {
+        alert(`Data master tidak ditemukan untuk kategori ${category}!`);
+        return;
     }
 
     document.getElementById("totalMasters").textContent = masters.length;
 
-    // Generate master list
     const masterList = document.getElementById("masterList");
     masterList.innerHTML = "";
 
     masters.forEach((master, index) => {
         const masterName = typeof master === "string" ? master : `${master.name} (${master.code})`;
-
         const masterItem = document.createElement("div");
         masterItem.className = "master-item";
         masterItem.innerHTML = `
-      <div class="master-item-header">
-        <div class="master-name">${index + 1}. ${masterName}</div>
-        <div class="status-buttons">
-          <button type="button" class="btn-ok" onclick="selectStatus(${index}, 'OK')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            OK
-          </button>
-          <button type="button" class="btn-ng" onclick="selectStatus(${index}, 'NG')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="15" y1="9" x2="9" y2="15"></line>
-              <line x1="9" y1="9" x2="15" y2="15"></line>
-            </svg>
-            NG
-          </button>
-        </div>
-      </div>
-      <div class="remark-field" id="remark-${index}">
-        <label class="form-label">Remarks <span class="required">*</span></label>
-        <textarea class="remark-textarea" id="remark-text-${index}" placeholder="Tuliskan keterangan untuk status NG..."></textarea>
-      </div>
-    `;
+            <div class="master-item-header">
+                <div class="master-name">${index + 1}. ${masterName}</div>
+                <div class="status-buttons">
+                    <button type="button" class="btn-ok" onclick="selectStatus(${index}, 'OK')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        OK
+                    </button>
+                    <button type="button" class="btn-ng" onclick="selectStatus(${index}, 'NG')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                        NG
+                    </button>
+                </div>
+            </div>
+            <div class="remark-field" id="remark-${index}">
+                <label class="form-label">Remarks <span class="required">*</span></label>
+                <textarea class="remark-textarea" id="remark-text-${index}" placeholder="Tuliskan keterangan untuk status NG..."></textarea>
+            </div>
+        `;
         masterList.appendChild(masterItem);
     });
-
-    console.log("[v0] Master list generated, switching to step 2");
 
     // Switch to step 2
     document.getElementById("step1").classList.remove("active");
     document.getElementById("step2").classList.add("active");
-
-}   //akhir dari fungsi gotostep2
+}
 
 // Go back to step 1
 function goToStep1() {
