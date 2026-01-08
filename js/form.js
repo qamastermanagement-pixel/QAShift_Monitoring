@@ -1247,7 +1247,7 @@ const CHANNEL_MASTERS = {
                 { name: "Pairing IR", code: "A13PR2" },
                 { name: "Augrease Mandril - condition d1;d2;d3", code: "A13Mn4" },
             ],
-            pokayoke: [
+            Pokayoke: [
                 { name: "OD Check - Over", code: "A13AO1" },
                 { name: "OD Check - Running", code: "A13AO2" },
                 { name: "OD Check - OK", code: "A13AO3" },
@@ -1299,7 +1299,7 @@ const CHANNEL_MASTERS = {
                 { name: "Pairing IR", code: "B13PR2" },
                 { name: "Augrease Mandril - condition d1;d2;d3", code: "B13Mn4" },
             ],
-            pokayoke: [
+            Pokayoke: [
                 { name: "OD Check - Over", code: "B13AO1" },
                 { name: "OD Check - Running", code: "B13AO2" },
                 { name: "OD Check - OK", code: "B13AO3" },
