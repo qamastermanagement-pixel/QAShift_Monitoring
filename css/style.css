@@ -849,3 +849,27 @@ body {
   text-align: center;
   color: #64748b;
 }
+
+.remark-type-group {
+  margin: 8px 0;
+}
+.remark-type-group label {
+  display: inline-block;
+  margin-right: 15px;
+  cursor: pointer;
+  font-weight: normal;
+}
+.remark-input {
+  margin-top: 8px;
+}
+.remark-textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+}
+.error-msg {
+  font-size: 12px;
+}
