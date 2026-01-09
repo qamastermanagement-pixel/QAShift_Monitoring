@@ -1864,15 +1864,13 @@ async function submitData() {
         let remark = ""
         if (status === "NG") {
             remark = document.getElementById(`remark-text-${i}`).value.trim();
-
-            // Jika ada isi, cek apakah hanya angka (boleh +, -, .)
             if (remark !== "") {
-            // Regex untuk angka numerik (boleh negatif, positif, desimal)
-            const numericRegex = /^[-+]?\d*\.?\d+$/;
-
-            if (!numericRegex.test(remark)) {
-               const masterDisplay = typeof masters[i] === "string" ? masters[i] : `${masters[i].name} (${masters[i].code})`;
-                alert(`Remark untuk ${masterDisplay} hanya boleh berupa angka (misal: 0, -1, +3, +0.5). Tidak boleh teks seperti "missing" atau "patah".`);
+                
+                // Izinkan: "0", "-1", "+3.5", atau "-9;-10;-11", "1;2;-3.5"
+                const numericListRegex = /^([-+]?\d*\.?\d+)(;[-+]?\d*\.?\d+)*$/;
+                if (!numericListRegex.test(remark)) {
+                const masterDisplay = typeof masters[i] === "string" ? masters[i] : `${masters[i].name} (${masters[i].code})`;
+                alert(`Remark untuk ${masterDisplay} hanya boleh berupa angka (misal: 0, -1, +3) atau daftar angka dipisah titik koma (misal: -9;-10;-11).Tidak boleh teks seperti "missing" atau "patah".`);
                 return;
             }
         }
