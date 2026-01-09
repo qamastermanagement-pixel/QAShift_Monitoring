@@ -1784,8 +1784,55 @@ function goToStep2() {
                 <label class="form-label">Remarks <span class="required">*</span></label>
                 <textarea class="remark-textarea" id="remark-text-${index}" placeholder="Remark hanya boleh diisi jika ada perubahan nilai numerik pada master"></textarea>
             </div>
+            <div class="remark-field" id="remark-${index}">
+                <label class="form-label">Jenis Remark</label>
+                <div class="remark-type-group">
+                <label>
+                    <input type="radio" name="remarkType_${index}" value="numeric" checked>
+                     Perubahan nilai pada master
+                    </label>
+                    <label>
+                        <input type="radio" name="remarkType_${index}" value="text">
+                        Lainnya: Keterangan
+                    </label>
+                </div>
+
+                <!-- Numeric remark -->
+                <div class="remark-input numeric-input" id="numericInput_${index}">
+                    <textarea class="remark-textarea" 
+                                    placeholder="Remark hanya boleh diisi jika ada perubahan nilai numerik pada master"
+                                    ></textarea>
+                    <small class="error-msg" id="errorNumeric_${index}" style="color:red; display:none;"></small>
+                </div>
+
+                <!-- Text remark -->
+                <div class="remark-input text-input" id="textInput_${index}" style="display:none;">
+                    <textarea class="remark-textarea" 
+                                    placeholder="Remark diisi jika NG, dapat berupa problem yang terjadi. Tapi bukan perubahan nilai!"
+                                    ></textarea>
+                </div>
+            </div>
         `;
         masterList.appendChild(masterItem);
+
+        // Tambahkan event listener untuk toggle remark type
+        document.querySelectorAll(`input[name="remarkType_${index}"]`).forEach(radio => {
+            radio.addEventListener("change", function () {
+                const numericDiv = document.getElementById(`numericInput_${index}`);
+                const textDiv = document.getElementById(`textInput_${index}`);
+                const errorDiv = document.getElementById(`errorNumeric_${index}`);
+
+                if (this.value === "numeric") {
+                    numericDiv.style.display = "block";
+                    textDiv.style.display = "none";
+                    errorDiv.style.display = "none";
+                } else {
+                    numericDiv.style.display = "none";
+                    textDiv.style.display = "block";
+                    errorDiv.style.display = "none";
+                }
+            });
+        });
     });
 
     // Simpan daftar master yang ditampilkan (termasuk hasil filter Clearance)
@@ -1804,28 +1851,43 @@ function goToStep1() {
 
 // Select status for master
 function selectStatus(index, status) {
-    const masterItem = document.querySelectorAll(".master-item")[index]
-    const okBtn = masterItem.querySelector(".btn-ok")
-    const ngBtn = masterItem.querySelector(".btn-ng")
-    const remarkField = document.getElementById(`remark-${index}`)
+  const masterItem = document.querySelectorAll(".master-item")[index];
+  const okBtn = masterItem.querySelector(".btn-ok");
+  const ngBtn = masterItem.querySelector(".btn-ng");
+  const remarkField = document.getElementById(`remark-${index}`);
 
-    // Remove active class from both buttons
-    okBtn.classList.remove("active")
-    ngBtn.classList.remove("active")
+  // Remove active class from both buttons
+  okBtn.classList.remove("active");
+  ngBtn.classList.remove("active");
 
-    // Add active class to selected button
-    if (status === "OK") {
-        okBtn.classList.add("active")
-        remarkField.classList.remove("show")
-        document.getElementById(`remark-text-${index}`).value = ""
-    } else {
-        ngBtn.classList.add("active")
-        remarkField.classList.add("show")
-    }
+  // Add active class to selected button
+  if (status === "OK") {
+    okBtn.classList.add("active");
+    remarkField.style.display = "none";
+    // Reset ke opsi default (numeric)
+    const numericRadio = document.querySelector(`input[name="remarkType_${index}"][value="numeric"]`);
+    if (numericRadio) numericRadio.checked = true;
+    // Sembunyikan error
+    const errorDiv = document.getElementById(`errorNumeric_${index}`);
+    if (errorDiv) errorDiv.style.display = "none";
+  } else {
+    ngBtn.classList.add("active");
+    remarkField.style.display = "block";
+    // Default ke "numeric"
+    const numericRadio = document.querySelector(`input[name="remarkType_${index}"][value="numeric"]`);
+    if (numericRadio) numericRadio.checked = true;
+    // Trigger tampilan numeric
+    const numericDiv = document.getElementById(`numericInput_${index}`);
+    const textDiv = document.getElementById(`textInput_${index}`);
+    if (numericDiv) numericDiv.style.display = "block";
+    if (textDiv) textDiv.style.display = "none";
+    const errorDiv = document.getElementById(`errorNumeric_${index}`);
+    if (errorDiv) errorDiv.style.display = "none";
+  }
 
-    // Store status
-    okBtn.dataset.status = status
-    ngBtn.dataset.status = status
+  // Store status
+  okBtn.dataset.status = status;
+  ngBtn.dataset.status = status;
 }
 
 async function submitData() {
@@ -1861,18 +1923,42 @@ async function submitData() {
             return
         }
 
-        let remark = ""
+        let remark = "";
         if (status === "NG") {
-            remark = document.getElementById(`remark-text-${i}`).value.trim();
-            if (remark !== "") {
-                
-                // Izinkan: "0", "-1", "+3.5", atau "-9;-10;-11", "1;2;-3.5"
-                const numericListRegex = /^([-+]?\d*\.?\d+)(;[-+]?\d*\.?\d+)*$/;
-                if (!numericListRegex.test(remark)) {
-                const masterDisplay = typeof masters[i] === "string" ? masters[i] : `${masters[i].name} (${masters[i].code})`;
-                alert(`Remark untuk ${masterDisplay} hanya boleh berupa angka (misal: 0, -1, +3) atau daftar angka dipisah titik koma (misal: -9;-10;-11).Tidak boleh teks seperti "missing" atau "patah".`);
+            const masterDisplay = typeof masters[i] === "string" ? masters[i] : `${masters[i].name} (${masters[i].code})`;
+            const numericRadio = document.querySelector(`input[name="remarkType_${i}"][value="numeric"]`);
+            const textRadio = document.querySelector(`input[name="remarkType_${i}"][value="text"]`);
+            const numericTextarea = document.getElementById(`numericInput_${i}`)?.querySelector("textarea");
+            const textTextarea = document.getElementById(`textInput_${i}`)?.querySelector("textarea");
+            const errorDiv = document.getElementById(`errorNumeric_${i}`);  
+            
+            if (numericRadio?.checked) {
+                remark = numericTextarea?.value.trim() || "";
+                if (!remark) {
+                    if (errorDiv) {
+                        errorDiv.textContent = "Wajib diisi karena memilih 'Perubahan nilai pada master'";
+                        errorDiv.style.display = "block";
+            }
+            alert(`Mohon isi remark untuk ${masterDisplay}`);
+            return;
+            }
+
+            // Validasi format angka
+            const singleNum = /^[-+]?\d*\.?\d+$/;
+            const numList = /^([-+]?\d*\.?\d+)(;[-+]?\d*\.?\d+)*$/;
+
+            if (!singleNum.test(remark) && !numList.test(remark)) {
+                if (errorDiv) {
+                    errorDiv.textContent = "Hanya boleh angka (misal: 0, -1, +3, atau -9;-10;-11)";
+                    errorDiv.style.display = "block";
+                }
+                alert(`Format remark tidak valid untuk ${masterDisplay}`);
                 return;
             }
+            if (errorDiv) errorDiv.style.display = "none";
+
+        } else if (textRadio?.checked) {
+            remark = textTextarea?.value.trim() || ""; // Boleh kosong
         }
     }
 
