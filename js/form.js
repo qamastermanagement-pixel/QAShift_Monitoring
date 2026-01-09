@@ -1780,10 +1780,7 @@ function goToStep2() {
                     </button>
                 </div>
             </div>
-            <div class="remark-field" id="remark-${index}">
-                <label class="form-label">Remarks <span class="required">*</span></label>
-                <textarea class="remark-textarea" id="remark-text-${index}" placeholder="Remark hanya boleh diisi jika ada perubahan nilai numerik pada master"></textarea>
-            </div>
+           
             <div class="remark-field" id="remark-${index}">
                 <label class="form-label">Jenis Remark</label>
                 <div class="remark-type-group">
