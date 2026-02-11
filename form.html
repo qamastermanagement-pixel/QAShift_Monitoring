@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Navigation Header -->
     <nav class="nav-header">
         <div class="nav-container">
             <div class="nav-brand">
@@ -56,7 +55,6 @@
                 </div>
             </div>
 
-            <!-- NUM 1: Basic Info -->
             <div id="step1" class="form-step active">
                 <form id="basicInfoForm">
                     <div class="form-group">
@@ -107,10 +105,10 @@
 
                     <div class="form-group">
                         <label for="bearingType" class="form-label">Tipe Bearing <span class="required">*</span></label>
-                        <select id ="bearingType" class="form-select" required>                            
-                            <Option value="">Pilih Tipe</Option>
+                        <select id="bearingType" class="form-select" required>                            
+                            <option value="">Pilih Tipe</option>
                         </select>
-                        <p class="helper-text">Channel harus dipilih</p>
+                        <p class="helper-text">Tipe Bearing harus dipilih</p>
                     </div>
                     
                     <div class="form-group">
@@ -124,7 +122,6 @@
                         <p class="helper-text">Kategori harus dipilih</p>
                     </div> 
                     
-                    <!-- Tambahkan ini DI BAWAH field Kategori -->
                     <div id="clearanceField" class="form-group" style="display: none;">
                         <label for="clearanceType" class="form-label">Tipe Clearance yang Sedang Running? <span class="required">*</span></label>
                         <select id="clearanceType" class="form-select">
@@ -143,17 +140,16 @@
                             Lanjutkan ke Data Pemeriksaan <span style="font-size: 1.25rem;">→</span>
                         </button>
                     </div>
-                   
+                    
                 </form>
             </div>
 
-            <!-- NUM 2: Master Check -->
-            <div id="step2" class="form-step">
+            <div id="step2" class="form-step" style="display: none;">
                 <div class="info-alert">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.0AC1" y2="8"></line>
+                        <line x1="12" y1="8" x2="12" y2="8"></line>
                     </svg>
                     <div>
                         <p class="alert-title">Perhatian: Anda sedang mengisi untuk</p>
@@ -162,7 +158,20 @@
                 </div>
 
                 <form id="masterCheckForm">
-                    <div id="masterList"></div>
+                    <div class="table-responsive" style="margin-top: 20px; margin-bottom: 20px; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead style="background-color: #f8f9fa;">
+                                <tr>
+                                    <th style="padding: 12px; border-bottom: 2px solid #ddd;">No</th>
+                                    <th style="padding: 12px; border-bottom: 2px solid #ddd;">Item Pengecekan</th>
+                                    <th style="padding: 12px; border-bottom: 2px solid #ddd;">Status</th>
+                                    <th style="padding: 12px; border-bottom: 2px solid #ddd;">Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div class="form-actions">
                         <button type="button" class="btn-back" onclick="goToStep1()">
