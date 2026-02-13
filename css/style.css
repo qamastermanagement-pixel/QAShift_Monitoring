@@ -1849,3 +1849,113 @@ body {
   filter: saturate(115%) contrast(105%) !important;
 }
 
+/* NG Tracker - Detail Button (match theme) */
+.ng-detail-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 7px 12px;
+  border-radius: 999px;
+
+  background: #ffffff;
+  border: 1.5px solid rgba(37, 99, 235, 0.45); /* biru soft */
+  color: #1d4ed8; /* biru */
+
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1;
+  text-decoration: none;
+
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+  white-space: nowrap;
+}
+
+.ng-detail-btn .ng-arrow {
+  font-weight: 900;
+  opacity: 0.9;
+}
+
+.ng-detail-btn:hover {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.8);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.12);
+  transform: translateY(-1px);
+}
+
+.ng-detail-btn:active {
+  transform: translateY(0px);
+  box-shadow: none;
+}
+
+/* NG Tracker - Small Green Round Arrow Button */
+.ng-detail-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 999px;
+  background: #16a34a;        /* hijau */
+  color: #ffffff;
+
+  font-weight: 900;
+  font-size: 14px;
+  text-decoration: none;
+
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+}
+
+.ng-detail-btn:hover {
+  background: #15803d;        /* hijau lebih gelap */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(22, 163, 74, 0.35);
+}
+
+.ng-detail-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Problem donut legend: stacked, easier to read */
+#problemLegend{
+  display: grid;
+  grid-template-columns: 1fr; /* satu kolom -> kebawah */
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.problem-legend-item{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.problem-legend-swatch{
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-top: 6px;
+  flex: 0 0 auto;
+}
+
+.problem-legend-text{
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.problem-legend-label{
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: #0f172a; /* slate-900, biar jelas */
+}
+
+.problem-legend-pct{
+  font-size: 0.86rem;
+  color: #64748b; /* slate-500 */
+  margin-top: 2px;
+}
