@@ -1,5 +1,6 @@
 let allData = []
 let chartInstance = null
+let problemChartInstance = null
 
 // ================================
 // LOADING MODAL FUNCTIONS
@@ -23,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("[v3] Dashboard.js loaded")
   console.log("[v3] CONFIG:", window.CONFIG)
 
-  // default date = today
   const today = new Date().toISOString().split("T")[0]
   document.getElementById("filterDate").value = today
 
@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 200)
   })
 
-  // PDF button
   const btnPdf = document.getElementById("btnDownloadNGPdf")
   if (btnPdf) btnPdf.addEventListener("click", downloadNGFormalPdf)
 })
@@ -90,14 +89,14 @@ function filterAndDisplayData() {
   updateStats(filteredData)
   updateChannelTable(filteredData)
   updateChart(filteredData)
+  updateProblemDonut(filteredData)
   updateNGTrackerTable(filteredData)
 }
 
 // ================================
-// STATS  ✅ UPDATED (include CH0 CELL 1-3)
+// STATS
 // ================================
 function updateStats(data) {
-  // ✅ Urutan channel yang dianggap "checkpoint"
   const CHANNEL_ORDER = [
     "CH 0 - CELL 1",
     "CH 0 - CELL 2",
@@ -138,7 +137,7 @@ function updateStats(data) {
 }
 
 // ================================
-// CHANNEL TABLE ✅ UPDATED (show CH0 CELL 1-3)
+// CHANNEL TABLE
 // ================================
 function updateChannelTable(data) {
   const tableBody = document.getElementById("channelTable")
@@ -159,7 +158,6 @@ function updateChannelTable(data) {
       : statusMap[channel][shift].ng++
   })
 
-  // ✅ Urutan tampil di table
   const CHANNEL_ORDER = [
     "CH 0 - CELL 1",
     "CH 0 - CELL 2",
@@ -184,27 +182,23 @@ function updateChannelTable(data) {
 function generateShiftCell(map, channel, shift) {
   const data = map[channel]?.[shift]
 
-  if (!data) {
-    return `<td><span class="status-indicator empty">-</span></td>`
-  }
-
-  if (data.ng > 0) {
-    return `<td><span class="status-indicator ng">${data.ng}</span></td>`
-  }
-
+  if (!data) return `<td><span class="status-indicator empty">-</span></td>`
+  if (data.ng > 0) return `<td><span class="status-indicator ng">${data.ng}</span></td>`
   return `<td><span class="status-indicator ok">✓</span></td>`
 }
 
 // ================================
-// CHART
+// CHART 1: OK vs NG
 // ================================
 function updateChart(data) {
   let ok = 0
   let ng = 0
 
-  data.forEach((e) => (e.Status === "OK" ? ok++ : ng++))
+  data.forEach((e) => (String(e.Status || "").toUpperCase() === "OK" ? ok++ : ng++))
 
-  const ctx = document.getElementById("statusChart").getContext("2d")
+  const canvas = document.getElementById("statusChart")
+  if (!canvas) return
+  const ctx = canvas.getContext("2d")
 
   if (chartInstance) chartInstance.destroy()
 
@@ -229,14 +223,128 @@ function updateChart(data) {
             label: (c) => {
               const total = ok + ng
               const pct = total > 0 ? Math.round((c.parsed / total) * 100) : 0
-              return `${c.label}: ${c.parsed} (${pct}%)`
+              return `${c.label}: ${pct}%`
             },
           },
         },
       },
     },
   })
+
+  // Legend stacked kebawah + persen aja
+  const legend = document.getElementById("statusLegend")
+  if (!legend) return
+  legend.innerHTML = ""
+
+  const total = ok + ng
+  const items = [
+    { label: "OK Masters", val: ok, color: "#10B981" },
+    { label: "NG Masters", val: ng, color: "#EF4444" },
+  ]
+
+  items.forEach((it) => {
+    const pct = total > 0 ? Math.round((it.val / total) * 100) : 0
+
+    const div = document.createElement("div")
+    div.className = "problem-legend-item" // reuse style stacked legend
+    div.innerHTML = `
+      <span class="problem-legend-swatch" style="background:${it.color};"></span>
+      <span class="problem-legend-text">
+        <span class="problem-legend-label">${it.label}</span>
+        <span class="problem-legend-pct">(${pct}%)</span>
+      </span>
+    `
+    legend.appendChild(div)
+  })
 }
+
+
+// ================================
+// CHART 2: NG Problem Distribution (same doughnut style)
+// ================================
+function updateProblemDonut(data) {
+  const canvas = document.getElementById("problemDonutChart")
+  if (!canvas) return
+  const ctx = canvas.getContext("2d")
+
+  const legend = document.getElementById("problemLegend")
+  if (legend) legend.innerHTML = ""
+
+  // ambil NG saja
+  const ng = data.filter((e) => String(e.Status || "").toUpperCase() === "NG")
+
+  // hitung problem (kolom L header kamu sekarang "Problem")
+  const count = {}
+  ng.forEach((e) => {
+    const p = String(e["Problem"] ?? "-").trim() || "-"
+    count[p] = (count[p] || 0) + 1
+  })
+
+  // urutin yang paling banyak
+  const pairs = Object.entries(count).map(([label, val]) => ({ label, val }))
+  pairs.sort((a, b) => b.val - a.val)
+
+  // kalau kosong, bikin chart dummy
+  const labels = pairs.length ? pairs.map((x) => x.label) : ["No NG"]
+  const values = pairs.length ? pairs.map((x) => x.val) : [1]
+
+  // warna default
+  const COLORS = ["#3B82F6", "#F59E0B", "#A855F7", "#EF4444", "#10B981", "#64748B"]
+  const bg = labels.map((_, i) => COLORS[i % COLORS.length])
+
+  if (problemChartInstance) problemChartInstance.destroy()
+
+  problemChartInstance = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels,
+      datasets: [
+        {
+          data: values,
+          backgroundColor: bg,
+          borderWidth: 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (c) => {
+              const total = values.reduce((a, b) => a + b, 0)
+              const pct = total > 0 ? Math.round((c.parsed / total) * 100) : 0
+              return `${c.label}: ${pct}%`
+            },
+          },
+        },
+      },
+    },
+  })
+
+  // legend custom -> kebawah + cuma (xx%)
+  if (legend) {
+    const total = values.reduce((a, b) => a + b, 0)
+
+    labels.forEach((lbl, i) => {
+      const val = values[i]
+      const pct = total > 0 ? Math.round((val / total) * 100) : 0
+
+      const item = document.createElement("div")
+      item.className = "problem-legend-item"
+      item.innerHTML = `
+        <span class="problem-legend-swatch" style="background:${bg[i]};"></span>
+        <span class="problem-legend-text">
+          <span class="problem-legend-label">${lbl}</span>
+          <span class="problem-legend-pct">(${pct}%)</span>
+        </span>
+      `
+      legend.appendChild(item)
+    })
+  }
+}
+
 
 // ================================
 // NG TRACKER TABLE
@@ -248,27 +356,47 @@ function updateNGTrackerTable(data) {
   const ngEntries = data.filter((entry) => entry.Status === "NG")
 
   if (ngEntries.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center">Tidak ada NG hari ini</td></tr>`
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center">Tidak ada NG hari ini</td></tr>`
     return
   }
 
   ngEntries.forEach((entry) => {
+    const tanggal = entry.Tanggal || "-"
+    const channel = entry.Channel || "-"
+    const code = entry.Code || "-"
+    const master = entry.Master || "-"
+    const problem = entry["Problem"] || "-"
+
+    const params = new URLSearchParams({
+      t: String(entry.Timestamp || ""),
+      d: String(tanggal || ""),
+      ch: String(channel || ""),
+      sh: String(entry.Shift || ""),
+      c: String(code || ""),
+      m: String(master || "")
+    })
+
+    const detailUrl = `ng-detail.html?${params.toString()}`
+
     const row = document.createElement("tr")
     row.innerHTML = `
-      <td>${entry.Tanggal}</td>
-      <td>${entry.Channel}</td>
-      <td>${entry.Shift}</td>
-      <td>${entry.Master}</td>
-      <td>${entry.Remark || ""}</td>
-      <td>${entry.Kategori || "-"}</td>
-      <td>${entry.Code || "-"}</td>
+      <td>${tanggal}</td>
+      <td>${channel}</td>
+      <td>${code}</td>
+      <td>${master}</td>
+      <td>${problem}</td>
+      <td>
+        <a class="ng-detail-link" href="${detailUrl}" title="Lihat detail NG">
+          Lihat <span class="arrow">→</span>
+        </a>
+      </td>
     `
     tbody.appendChild(row)
   })
 }
 
 // ================================
-// FORMAL PDF REPORT
+// FORMAL PDF REPORT (UNCHANGED)
 // ================================
 function downloadNGFormalPdf() {
   const tbody = document.getElementById("remarkTableBody")
@@ -280,6 +408,7 @@ function downloadNGFormalPdf() {
   const filterDate = document.getElementById("filterDate")?.value || new Date().toISOString().split("T")[0]
   const rows = Array.from(tbody.querySelectorAll("tr"))
 
+  // Kalau barisnya cuma placeholder "Tidak ada NG..."
   if (rows.length === 1) {
     const tds = rows[0].querySelectorAll("td")
     if (tds.length === 1 && (tds[0].textContent || "").toLowerCase().includes("tidak ada ng")) {
@@ -288,12 +417,17 @@ function downloadNGFormalPdf() {
     }
   }
 
+  // Ambil data dari tabel (6 kolom), tapi PDF hanya pakai 5 kolom pertama (tanpa "Detail")
   const data = []
   rows.forEach((tr) => {
     const cols = Array.from(tr.querySelectorAll("td")).map((td) => (td.textContent || "").trim())
-    if (cols.length >= 7) {
+
+    // ✅ sekarang tabel = 6 kolom
+    if (cols.length >= 6) {
       const rowDate = String(cols[0]).split("T")[0]
-      if (rowDate === filterDate) data.push(cols.slice(0, 7))
+      if (rowDate === filterDate) {
+        data.push(cols.slice(0, 5)) // Tanggal, Channel, Code, Master, Problem
+      }
     }
   })
 
@@ -302,6 +436,7 @@ function downloadNGFormalPdf() {
     return
   }
 
+  // helper countBy
   const countBy = (idx) => {
     const map = {}
     data.forEach((r) => {
@@ -323,8 +458,10 @@ function downloadNGFormalPdf() {
     return { key: bestK, val: bestV }
   }
 
+  // indeks baru:
+  // 0 Tanggal, 1 Channel, 2 Code, 3 Master, 4 Problem
   const topChannel = topOne(countBy(1))
-  const topCategory = topOne(countBy(5))
+  const topProblem = topOne(countBy(4))
   const topMaster = topOne(countBy(3))
   const totalNG = data.length
 
@@ -338,6 +475,7 @@ function downloadNGFormalPdf() {
   const pad2 = (n) => String(n).padStart(2, "0")
   const generatedAt = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())} ${pad2(now.getHours())}:${pad2(now.getMinutes())}`
 
+  // watermark
   doc.saveGraphicsState()
   doc.setTextColor(210)
   doc.setFont("helvetica", "bold")
@@ -347,6 +485,7 @@ function downloadNGFormalPdf() {
   doc.text("INTERNAL USE ONLY", pageW / 2, pageH / 2 + 5, { align: "center", angle: 25 })
   doc.restoreGraphicsState()
 
+  // header
   doc.setTextColor(20)
   doc.setFont("helvetica", "bold")
   doc.setFontSize(15)
@@ -359,6 +498,7 @@ function downloadNGFormalPdf() {
   doc.setLineWidth(0.3)
   doc.line(14, 28, pageW - 14, 28)
 
+  // info box
   const boxX = 14
   const boxY = 32
   const boxW = pageW - 28
@@ -379,15 +519,17 @@ function downloadNGFormalPdf() {
   doc.setFontSize(9.5)
   doc.text(`Generated at: ${generatedAt}`, boxX + 3, boxY + 20)
 
+  // table title
   doc.setFont("helvetica", "bold")
   doc.setFontSize(12)
   doc.text("A. NG TRACKER DETAIL", 14, boxY + boxH + 10)
 
+  // table body
   const body = data.map((r, i) => [String(i + 1), ...r])
 
   doc.autoTable({
     startY: boxY + boxH + 14,
-    head: [["No", "Tanggal", "Channel", "Shift", "Master", "Remark", "Kategori", "Code"]],
+    head: [["No", "Tanggal", "Channel", "Code", "Master", "Problem"]],
     body,
     theme: "grid",
     styles: { font: "helvetica", fontSize: 8.8, cellPadding: 2 },
@@ -395,16 +537,15 @@ function downloadNGFormalPdf() {
     margin: { left: 14, right: 14 },
     columnStyles: {
       0: { cellWidth: 8 },
-      1: { cellWidth: 20 },
-      2: { cellWidth: 24 },
-      3: { cellWidth: 12 },
-      4: { cellWidth: 60 },
-      5: { cellWidth: 18 },
-      6: { cellWidth: 22 },
-      7: { cellWidth: 16 },
+      1: { cellWidth: 22 },
+      2: { cellWidth: 26 },
+      3: { cellWidth: 20 },
+      4: { cellWidth: 55 },
+      5: { cellWidth: 55 },
     },
   })
 
+  // summary
   const afterTableY = doc.lastAutoTable.finalY + 10
   doc.setFont("helvetica", "bold")
   doc.setFontSize(12)
@@ -414,13 +555,13 @@ function downloadNGFormalPdf() {
   doc.setFontSize(10)
   doc.text(`• Total NG: ${totalNG}`, 16, afterTableY + 7)
   doc.text(`• Top Channel: ${topChannel.key} (${topChannel.val})`, 16, afterTableY + 13)
-  doc.text(`• Top Category: ${topCategory.key} (${topCategory.val})`, 16, afterTableY + 19)
+  doc.text(`• Top Problem: ${topProblem.key} (${topProblem.val})`, 16, afterTableY + 19)
   doc.text(`• Top Master: ${topMaster.key} (${topMaster.val})`, 16, afterTableY + 25)
 
+  // footer
   const pageCount = doc.getNumberOfPages()
   for (let p = 1; p <= pageCount; p++) {
     doc.setPage(p)
-
     doc.setDrawColor(200)
     doc.setLineWidth(0.2)
     doc.line(14, pageH - 18, pageW - 14, pageH - 18)
@@ -434,3 +575,4 @@ function downloadNGFormalPdf() {
 
   doc.save(`NG_Tracker_Report_${filterDate}.pdf`)
 }
+
