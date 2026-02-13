@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NG Detail - QA Master Management</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <nav class="nav-header">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="brand-logo">SKF</span>
+        <span class="brand-text">QA Master Management</span>
+      </div>
+      <div class="nav-links">
+        <a href="dashboard.html" class="nav-link active">Back to Dashboard</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">NG Detail</h1>
+      <p class="dashboard-subtitle">Detail penyebab NG untuk entry terpilih</p>
+    </div>
+
+    <div class="dashboard-section">
+      <div style="display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
+        <div>
+          <h2 class="section-title" style="margin:0;">Informasi NG</h2>
+          <div style="opacity:0.8; margin-top:4px;" id="subtitleInfo">-</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a class="btn-back" href="dashboard.html" style="text-decoration:none;">← Kembali</a>
+          <button class="btn-back" id="btnPrint" type="button">Print</button>
+        </div>
+      </div>
+
+      <div class="table-container" style="margin-top:14px;">
+        <table class="remark-table">
+          <tbody id="detailBody">
+            <tr><td>Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="loadingModal" class="modal">
+      <div class="modal-content">
+        <div class="spinner"></div>
+        <p id="loadingText">Memuat data...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/ng-detail.js"></script>
+</body>
+</html>
