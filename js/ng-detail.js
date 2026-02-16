@@ -6,7 +6,6 @@ function showLoading(text = "Memuat data...") {
   if (label) label.textContent = text
   if (modal) modal.classList.add("show")
 }
-
 function hideLoading() {
   const modal = document.getElementById("loadingModal")
   if (modal) modal.classList.remove("show")
@@ -25,15 +24,23 @@ function row(label, value) {
   return `<tr><th style="text-align:left; width:220px;">${esc(label)}</th><td>${esc(value ?? "-")}</td></tr>`
 }
 
+function makeRowId(e) {
+  const ts = String(e.Timestamp || "").trim()
+  const code = String(e.Code || "").trim()
+  const master = String(e.Master || "").trim()
+  const channel = String(e.Channel || "").trim()
+  const shift = String(e.Shift || "").trim()
+  return [ts, code, master, channel, shift].join("||")
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const btnPrint = document.getElementById("btnPrint")
   if (btnPrint) btnPrint.addEventListener("click", () => window.print())
 
   const qs = new URLSearchParams(location.search)
 
-  // key dari dashboard
   const key = {
-    Timestamp: qs.get("t") || "",
+    id: qs.get("id") || "",
     Tanggal: qs.get("d") || "",
     Channel: qs.get("ch") || "",
     Shift: qs.get("sh") || "",
@@ -41,10 +48,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     Master: qs.get("m") || "",
   }
 
-  const subtitleEl = document.getElementById("subtitleInfo")
-  if (subtitleEl) {
-    subtitleEl.textContent = `${key.Tanggal || "-"} • ${key.Channel || "-"} • Shift ${key.Shift || "-"}`
-  }
+  document.getElementById("subtitleInfo").textContent =
+    `${key.Tanggal || "-"} • ${key.Channel || "-"} • Shift ${key.Shift || "-"}`
 
   showLoading("Memuat detail NG...")
 
@@ -55,14 +60,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (result.status !== "success") throw new Error(result.message || "API error")
     allData = result.data || []
 
-    // Cari entry paling cocok:
-    // Prioritas Timestamp, kalau kosong pakai kombinasi (Tanggal+Channel+Shift+Code+Master)
     let entry = null
 
-    if (key.Timestamp) {
-      entry = allData.find((e) => String(e.Timestamp || "") === String(key.Timestamp))
+    // ✅ 1) Cari pakai ID unik
+    if (key.id) {
+      entry = allData.find((e) => makeRowId(e) === key.id)
     }
 
+    // ✅ 2) Fallback (kalau id kosong / ga ketemu)
     if (!entry) {
       entry = allData.find((e) =>
         String(e.Tanggal || "") === String(key.Tanggal || "") &&
@@ -85,10 +90,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return
     }
 
-    // Header sheet kamu sekarang:
-    // K: "Remark Value"
-    // L: "Problem"
-    // M: "Detail"
     const problem = entry["Problem"] || "-"
     const remarkValue = entry["Remark Value"] || "-"
     const detail = entry["Detail"] || "-"
