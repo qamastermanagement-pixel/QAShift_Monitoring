@@ -1959,3 +1959,26 @@ body {
   color: #64748b; /* slate-500 */
   margin-top: 2px;
 }
+
+/* ===== Tabs ===== */
+.tabbar{
+  display:flex;
+  gap:10px;
+  flex-wrap: wrap;
+}
+.tab-btn{
+  border: 2px solid var(--border);
+  background: white;
+  color: var(--text);
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.tab-btn.active{
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(0,102,204,0.08);
+}
+.tab-page{ display:none; }
+.tab-page.active{ display:block; }
