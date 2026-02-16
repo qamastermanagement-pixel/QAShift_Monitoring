@@ -1,10 +1,15 @@
 // ===================================================
-// NOTES FORM
-// - UI Step2 pakai CARD 
+// form.js (AUTO UI CARD) + FETCH MASTER CSV + REMARK 4 OPSI
+// - UI Step2 pakai CARD (master-item) seperti versi lama
 // - Remark 4 opsi (OPT1..OPT4) vertical
 // - AUTO buat #masterList kalau HTML Step2 tidak punya
 // - AUTO sembunyikan header table "No Master Status Remark" jika masih ada di HTML
 // - Payload masters: remarkValue, remarkType, remarkDetail
+//
+// UPDATE (sesuai request):
+// - OPT1 & OPT2: tambah textarea opsional (keterangan tambahan)
+//   -> disubmit masuk ke remarkDetail (bukan kolom baru)
+//   -> remarkValue tetap khusus angka deviasi (tetap wajib + validasi sama)
 // ===================================================
 
 let MASTER_DATA = [];
@@ -109,24 +114,29 @@ const REMARK_HELPER = {
   OPT4: "Wajib: jelaskan kondisi/temuan lainnya.",
 };
 
+// NEW: helper untuk textarea opsional OPT1/OPT2
+const REMARK_OPT_HELPER = {
+  OPT1: "Opsional: isi jika ada temuan/kondisi tambahan.",
+  OPT2: "Opsional: isi jika ada temuan/kondisi tambahan.",
+};
+
 const REMARK_VALUE_EXCEPTIONS = new Set([]);
 
 function isValidDeviationValue(raw) {
-  const v = String(raw ?? "").trim()
-  if (!v) return false
-  if (REMARK_VALUE_EXCEPTIONS.has(v)) return true
+  const v = String(raw ?? "").trim();
+  if (!v) return false;
+  if (REMARK_VALUE_EXCEPTIONS.has(v)) return true;
 
   // hilangkan spasi, ubah koma -> titik
-  const norm = v.replace(/\s+/g, "").replace(/,/g, ".")
+  const norm = v.replace(/\s+/g, "").replace(/,/g, ".");
 
   // support multi nilai dipisah ';'  contoh: -13;-14;-5  atau +5;-2;0.02
-  const parts = norm.split(";").filter(Boolean)
-  if (!parts.length) return false
+  const parts = norm.split(";").filter(Boolean);
+  if (!parts.length) return false;
 
-  const oneNumberRegex = /^[+-]?(\d+(\.\d+)?|\.\d+)$/
-  return parts.every((p) => oneNumberRegex.test(p))
+  const oneNumberRegex = /^[+-]?(\d+(\.\d+)?|\.\d+)$/;
+  return parts.every((p) => oneNumberRegex.test(p));
 }
-
 
 // =========================
 // FIX: Sembunyikan header table "No Master Status Remark" (sisa HTML lama)
@@ -135,7 +145,6 @@ function hideLegacyTableHeader() {
   const step2 = document.getElementById("step2");
   if (!step2) return;
 
-  // cek apakah di step2 ada <th> dengan label tersebut
   const ths = Array.from(step2.querySelectorAll("th")).map((th) =>
     cleanStr(th.textContent).toLowerCase()
   );
@@ -148,7 +157,6 @@ function hideLegacyTableHeader() {
 
   if (!hasLegacyHeader) return;
 
-  // sembunyikan table yang mengandung header itu
   const thAny = step2.querySelector("th");
   const table = thAny ? thAny.closest("table") : null;
 
@@ -466,6 +474,12 @@ function goToStep2() {
           <div class="error-msg" id="remarkValueErr_${index}" style="display:none; color:red; margin-top:6px;"></div>
         </div>
 
+        <!-- ✅ NEW: textarea opsional khusus OPT1/OPT2 (disimpan ke remarkDetail) -->
+        <div id="remarkOptBox_${index}" style="display:none; margin-top:10px;">
+          <textarea class="remark-textarea" id="remarkOptDetail_${index}" placeholder="Keterangan tambahan (opsional)..."></textarea>
+          <div style="margin-top:6px; font-size:12px; color:#64748b;" id="remarkOptHelp_${index}"></div>
+        </div>
+
         <div id="remarkDetailBox_${index}" style="display:none; margin-top:10px;">
           <textarea class="remark-textarea" id="remarkDetail_${index}" placeholder="Jelaskan kondisi..."></textarea>
           <div style="margin-top:6px; font-size:12px; color:#64748b;" id="remarkDetailHelp_${index}"></div>
@@ -505,13 +519,19 @@ function selectStatus(index, status) {
     document.querySelectorAll(`input[name="remarkType_${index}"]`).forEach((r) => (r.checked = false));
 
     const vBox = document.getElementById(`remarkValueBox_${index}`);
+    const oBox = document.getElementById(`remarkOptBox_${index}`); // NEW
     const dBox = document.getElementById(`remarkDetailBox_${index}`);
+
     if (vBox) vBox.style.display = "none";
+    if (oBox) oBox.style.display = "none"; // NEW
     if (dBox) dBox.style.display = "none";
 
     const v = document.getElementById(`remarkValue_${index}`);
+    const o = document.getElementById(`remarkOptDetail_${index}`); // NEW
     const d = document.getElementById(`remarkDetail_${index}`);
+
     if (v) v.value = "";
+    if (o) o.value = ""; // NEW
     if (d) d.value = "";
 
     const vErr = document.getElementById(`remarkValueErr_${index}`);
@@ -546,8 +566,11 @@ function selectStatus(index, status) {
 
 function applyRemarkMode(index, opt) {
   const vBox = document.getElementById(`remarkValueBox_${index}`);
+  const oBox = document.getElementById(`remarkOptBox_${index}`); // NEW
   const dBox = document.getElementById(`remarkDetailBox_${index}`);
+
   const vHelp = document.getElementById(`remarkValueHelp_${index}`);
+  const oHelp = document.getElementById(`remarkOptHelp_${index}`); // NEW
   const dHelp = document.getElementById(`remarkDetailHelp_${index}`);
 
   const vErr = document.getElementById(`remarkValueErr_${index}`);
@@ -556,23 +579,36 @@ function applyRemarkMode(index, opt) {
   if (dErr) dErr.style.display = "none";
 
   if (vBox) vBox.style.display = "none";
+  if (oBox) oBox.style.display = "none"; // NEW default hide
   if (dBox) dBox.style.display = "none";
 
   if (opt === "OPT1" || opt === "OPT2") {
+    // OPT1/2: angka deviasi + catatan opsional
     if (vBox) vBox.style.display = "block";
     if (vHelp) vHelp.textContent = REMARK_HELPER[opt];
+
+    if (oBox) oBox.style.display = "block";
+    if (oHelp) oHelp.textContent = REMARK_OPT_HELPER[opt] || "Opsional.";
+
     if (dHelp) dHelp.textContent = "";
+
+    // pastikan detail utama (OPT3/4) kosong
     const d = document.getElementById(`remarkDetail_${index}`);
     if (d) d.value = "";
     return;
   }
 
   if (opt === "OPT3" || opt === "OPT4") {
+    // OPT3/4: pakai detail utama seperti sebelumnya
     if (dBox) dBox.style.display = "block";
     if (dHelp) dHelp.textContent = REMARK_HELPER[opt];
     if (vHelp) vHelp.textContent = "";
+
+    // reset value deviasi dan catatan opsional OPT1/2
     const v = document.getElementById(`remarkValue_${index}`);
+    const o = document.getElementById(`remarkOptDetail_${index}`);
     if (v) v.value = "";
+    if (o) o.value = "";
   }
 }
 
@@ -627,7 +663,9 @@ async function submitData() {
         remarkType = REMARK_TYPE_LABELS[opt] || "";
 
         const vInput = document.getElementById(`remarkValue_${i}`);
-        const dInput = document.getElementById(`remarkDetail_${i}`);
+        const oInput = document.getElementById(`remarkOptDetail_${i}`); // NEW (opsional OPT1/2)
+        const dInput = document.getElementById(`remarkDetail_${i}`);    // existing (OPT3/4)
+
         const vErr = document.getElementById(`remarkValueErr_${i}`);
         const dErr = document.getElementById(`remarkDetailErr_${i}`);
 
@@ -651,8 +689,10 @@ async function submitData() {
             hideLoading();
             return;
           }
-          remarkValue = v;
-          remarkDetail = "";
+
+          // ✅ sesuai request:
+          remarkValue = v; // angka deviasi tetap ke remarkValue
+          remarkDetail = oInput ? oInput.value.trim() : ""; // catatan opsional masuk detail (boleh kosong)
         } else if (opt === "OPT3") {
           remarkValue = "";
           remarkDetail = dInput ? dInput.value.trim() : "";
