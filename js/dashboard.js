@@ -3,6 +3,60 @@ let chartInstance = null
 let problemChartInstance = null
 
 // ================================
+// CONFIG / HELPERS
+// ================================
+const CHANNEL_ORDER = [
+  "CH 0 - CELL 1",
+  "CH 0 - CELL 2",
+  "CH 0 - CELL 3",
+  ...Array.from({ length: 16 }, (_, i) => `Channel ${i + 1}`),
+]
+
+const TOTAL_SHIFTS = 3
+const TOTAL_CHECKPOINTS = CHANNEL_ORDER.length * TOTAL_SHIFTS
+const CHANNEL_SET = new Set(CHANNEL_ORDER)
+
+// mode problem untuk dashboard (opsional dari window.CONFIG)
+function getProblemLabel(entry) {
+  const mode = (window.CONFIG?.PROBLEM_MODE || "RemarkType").trim()
+
+  const rt = String(entry?.RemarkType ?? "").trim()
+  const rv = String(entry?.RemarkValue ?? "").trim()
+  const rd = String(entry?.RemarkDetail ?? "").trim()
+
+  if (mode === "RemarkValue") return rv || "-"
+  if (mode === "RemarkValue+RemarkDetail") {
+    const a = rv || "-"
+    const b = rd || ""
+    return b ? `${a} | ${b}` : a
+  }
+  if (mode === "RemarkType+RemarkValue") {
+    const a = rt || "-"
+    const b = rv || ""
+    return b ? `${a} | ${b}` : a
+  }
+
+  // default: RemarkType
+  return rt || "-"
+}
+
+function normalizeStatus(val) {
+  const s = String(val ?? "").trim().toUpperCase()
+  if (s === "OK") return "OK"
+  if (s === "NG") return "NG"
+  return "UNKNOWN"
+}
+
+function normalizeChannel(val) {
+  return String(val ?? "").trim()
+}
+
+function normalizeShift(val) {
+  const s = String(val ?? "").trim()
+  return s || "-"
+}
+
+// ================================
 // LOADING MODAL FUNCTIONS
 // ================================
 function showLoading(text = "Memuat data...") {
@@ -21,8 +75,8 @@ function hideLoading() {
 // INIT
 // ================================
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("[v3] Dashboard.js loaded")
-  console.log("[v3] CONFIG:", window.CONFIG)
+  console.log("[v4] Dashboard.js loaded")
+  console.log("[v4] CONFIG:", window.CONFIG)
 
   const today = new Date().toISOString().split("T")[0]
   document.getElementById("filterDate").value = today
@@ -48,22 +102,22 @@ async function loadData() {
   showLoading("Memuat data dashboard...")
 
   try {
-    console.log("[v3] Fetching data...")
+    console.log("[v4] Fetching data...")
     const res = await fetch(window.CONFIG.APPS_SCRIPT_URL)
     const result = await res.json()
 
     if (result.status === "success") {
       allData = result.data || []
-      console.log("[v3] Data loaded:", allData.length)
+      console.log("[v4] Data loaded:", allData.length)
     } else {
       allData = []
-      console.error("[v3] API error:", result.message)
+      console.error("[v4] API error:", result.message)
       alert("Gagal memuat data dashboard: " + (result.message || "unknown error"))
     }
 
     filterAndDisplayData()
   } catch (err) {
-    console.error("[v3] Fetch failed:", err)
+    console.error("[v4] Fetch failed:", err)
     allData = []
     filterAndDisplayData()
     alert("Gagal memuat data. Cek koneksi / Apps Script.\n" + err.message)
@@ -77,14 +131,14 @@ async function loadData() {
 // ================================
 function filterAndDisplayData() {
   const filterDate = document.getElementById("filterDate").value
-  console.log("[v3] Filter date:", filterDate)
+  console.log("[v4] Filter date:", filterDate)
 
   const filteredData = allData.filter((entry) => {
     const entryDate = String(entry.Tanggal).split("T")[0]
     return entryDate === filterDate
   })
 
-  console.log("[v3] Filtered:", filteredData.length)
+  console.log("[v4] Filtered:", filteredData.length)
 
   updateStats(filteredData)
   updateChannelTable(filteredData)
@@ -97,29 +151,25 @@ function filterAndDisplayData() {
 // STATS
 // ================================
 function updateStats(data) {
-  const CHANNEL_ORDER = [
-    "CH 0 - CELL 1",
-    "CH 0 - CELL 2",
-    "CH 0 - CELL 3",
-    ...Array.from({ length: 16 }, (_, i) => `Channel ${i + 1}`),
-  ]
-
-  const TOTAL_SHIFTS = 3
-  const TOTAL_CHECKPOINTS = CHANNEL_ORDER.length * TOTAL_SHIFTS
-
   let okCount = 0
   let ngCount = 0
+  let unknownCount = 0
 
   const checkpointSet = new Set()
 
   data.forEach((entry) => {
-    const channel = entry.Channel
-    const shift = String(entry.Shift)
+    const channel = normalizeChannel(entry.Channel)
+    const shift = normalizeShift(entry.Shift)
+    const st = normalizeStatus(entry.Status)
 
-    if (entry.Status === "OK") okCount++
-    else ngCount++
+    if (st === "OK") okCount++
+    else if (st === "NG") ngCount++
+    else unknownCount++
 
-    checkpointSet.add(`${channel}-shift-${shift}`)
+    // Coverage cuma untuk channel yang valid (sesuai daftar)
+    if (CHANNEL_SET.has(channel) && (shift === "1" || shift === "2" || shift === "3")) {
+      checkpointSet.add(`${channel}-shift-${shift}`)
+    }
   })
 
   const covered = checkpointSet.size
@@ -134,6 +184,11 @@ function updateStats(data) {
   document.getElementById("okRate").textContent = okRate
   document.getElementById("coverage").textContent = `${coverage}%`
   document.getElementById("checkPoints").textContent = `${covered}/${TOTAL_CHECKPOINTS}`
+
+  // Optional debug
+  if (unknownCount > 0) {
+    console.warn("[v4] Found UNKNOWN status rows:", unknownCount)
+  }
 }
 
 // ================================
@@ -146,24 +201,17 @@ function updateChannelTable(data) {
   const statusMap = {}
 
   data.forEach((entry) => {
-    const channel = entry.Channel
-    const shift = String(entry.Shift)
-    const status = entry.Status
+    const channel = normalizeChannel(entry.Channel)
+    const shift = normalizeShift(entry.Shift)
+    const status = normalizeStatus(entry.Status)
 
     if (!statusMap[channel]) statusMap[channel] = {}
-    if (!statusMap[channel][shift]) statusMap[channel][shift] = { ok: 0, ng: 0 }
+    if (!statusMap[channel][shift]) statusMap[channel][shift] = { ok: 0, ng: 0, unknown: 0 }
 
-    status === "OK"
-      ? statusMap[channel][shift].ok++
-      : statusMap[channel][shift].ng++
+    if (status === "OK") statusMap[channel][shift].ok++
+    else if (status === "NG") statusMap[channel][shift].ng++
+    else statusMap[channel][shift].unknown++
   })
-
-  const CHANNEL_ORDER = [
-    "CH 0 - CELL 1",
-    "CH 0 - CELL 2",
-    "CH 0 - CELL 3",
-    ...Array.from({ length: 16 }, (_, i) => `Channel ${i + 1}`),
-  ]
 
   CHANNEL_ORDER.forEach((channelName) => {
     const row = document.createElement("tr")
@@ -184,7 +232,9 @@ function generateShiftCell(map, channel, shift) {
 
   if (!data) return `<td><span class="status-indicator empty">-</span></td>`
   if (data.ng > 0) return `<td><span class="status-indicator ng">${data.ng}</span></td>`
-  return `<td><span class="status-indicator ok">✓</span></td>`
+  if (data.ok > 0) return `<td><span class="status-indicator ok">✓</span></td>`
+  // jika cuma unknown
+  return `<td><span class="status-indicator empty">?</span></td>`
 }
 
 // ================================
@@ -194,7 +244,7 @@ function updateChart(data) {
   let ok = 0
   let ng = 0
 
-  data.forEach((e) => (String(e.Status || "").toUpperCase() === "OK" ? ok++ : ng++))
+  data.forEach((e) => (normalizeStatus(e.Status) === "OK" ? ok++ : (normalizeStatus(e.Status) === "NG" ? ng++ : null)))
 
   const canvas = document.getElementById("statusChart")
   if (!canvas) return
@@ -258,7 +308,6 @@ function updateChart(data) {
   })
 }
 
-
 // ================================
 // CHART 2: NG Problem Distribution (same doughnut style)
 // ================================
@@ -271,12 +320,12 @@ function updateProblemDonut(data) {
   if (legend) legend.innerHTML = ""
 
   // ambil NG saja
-  const ng = data.filter((e) => String(e.Status || "").toUpperCase() === "NG")
+  const ng = data.filter((e) => normalizeStatus(e.Status) === "NG")
 
-  // hitung problem (kolom L header kamu sekarang "Problem")
+  // hitung problem dari RemarkType/RemarkValue sesuai mode
   const count = {}
   ng.forEach((e) => {
-    const p = String(e["Problem"] ?? "-").trim() || "-"
+    const p = getProblemLabel(e)
     count[p] = (count[p] || 0) + 1
   })
 
@@ -345,7 +394,6 @@ function updateProblemDonut(data) {
   }
 }
 
-
 // ================================
 // NG TRACKER TABLE
 // ================================
@@ -353,7 +401,7 @@ function updateNGTrackerTable(data) {
   const tbody = document.getElementById("remarkTableBody")
   tbody.innerHTML = ""
 
-  const ngEntries = data.filter((entry) => entry.Status === "NG")
+  const ngEntries = data.filter((entry) => normalizeStatus(entry.Status) === "NG")
 
   if (ngEntries.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" class="text-center">Tidak ada NG hari ini</td></tr>`
@@ -365,15 +413,28 @@ function updateNGTrackerTable(data) {
     const channel = entry.Channel || "-"
     const code = entry.Code || "-"
     const master = entry.Master || "-"
-    const problem = entry["Problem"] || "-"
+    const problem = getProblemLabel(entry)
+    const shift = entry.Shift || "-"
+    const ts = entry.Timestamp || ""
+
+    // ✅ ID unik (lebih aman): gabungan beberapa field + tanggal + problem
+    const rowId = [
+      String(ts).trim(),
+      String(tanggal).trim(),
+      String(code).trim(),
+      String(master).trim(),
+      String(channel).trim(),
+      String(shift).trim(),
+      String(problem).trim(),
+    ].join("||")
 
     const params = new URLSearchParams({
-      t: String(entry.Timestamp || ""),
+      id: rowId,
       d: String(tanggal || ""),
       ch: String(channel || ""),
-      sh: String(entry.Shift || ""),
+      sh: String(shift || ""),
       c: String(code || ""),
-      m: String(master || "")
+      m: String(master || ""),
     })
 
     const detailUrl = `ng-detail.html?${params.toString()}`
@@ -575,4 +636,3 @@ function downloadNGFormalPdf() {
 
   doc.save(`NG_Tracker_Report_${filterDate}.pdf`)
 }
-
