@@ -636,3 +636,48 @@ function downloadNGFormalPdf() {
 
   doc.save(`NG_Tracker_Report_${filterDate}.pdf`)
 }
+
+// ===============================
+// HIDE CHANNELS ON STATUS TRACKER
+// (Channel 4, 6, 15 disembunyikan)
+// Tempel di PALING BAWAH dashboard.js
+// ===============================
+(function () {
+  const HIDDEN = new Set(["4", "6", "15"]);
+
+  function normalizeChannelText(text) {
+    const s = String(text ?? "").trim();
+    // support "Channel 4" / "4" / "CH 4" dll
+    const m = s.match(/(\d+)/);
+    return m ? m[1] : s;
+  }
+
+  function removeHiddenRows() {
+    const tbody = document.getElementById("channelTable");
+    if (!tbody) return;
+
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    rows.forEach((tr) => {
+      const firstCell = tr.querySelector("td");
+      if (!firstCell) return;
+
+      const chNum = normalizeChannelText(firstCell.textContent);
+      if (HIDDEN.has(chNum)) tr.remove();
+    });
+  }
+
+  // 1) coba bersihin sekali setelah load
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", removeHiddenRows);
+  } else {
+    removeHiddenRows();
+  }
+
+  // 2) kalau tabel di-render ulang (karena filter tanggal / refresh), tetap kehapus
+  const tbody = document.getElementById("channelTable");
+  if (!tbody) return;
+
+  const obs = new MutationObserver(() => removeHiddenRows());
+  obs.observe(tbody, { childList: true, subtree: true });
+})();
+
