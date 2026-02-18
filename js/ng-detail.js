@@ -1,5 +1,8 @@
 let allData = []
 
+// ================================
+// LOADING
+// ================================
 function showLoading(text = "Memuat data...") {
   const modal = document.getElementById("loadingModal")
   const label = document.getElementById("loadingText")
@@ -11,6 +14,9 @@ function hideLoading() {
   if (modal) modal.classList.remove("show")
 }
 
+// ================================
+// HELPERS
+// ================================
 function esc(s) {
   return String(s ?? "")
     .replaceAll("&", "&amp;")
@@ -21,9 +27,43 @@ function esc(s) {
 }
 
 function row(label, value) {
-  return `<tr><th style="text-align:left; width:220px;">${esc(label)}</th><td>${esc(value ?? "-")}</td></tr>`
+  return `<tr>
+    <th style="text-align:left; width:220px;">${esc(label)}</th>
+    <td>${esc(value ?? "-")}</td>
+  </tr>`
 }
 
+// ambil field dengan banyak kemungkinan nama kolom
+function pick(entry, keys, fallback = "-") {
+  for (const k of keys) {
+    if (entry && entry[k] != null && String(entry[k]).trim() !== "") {
+      return entry[k]
+    }
+  }
+  return fallback
+}
+
+// samakan logic problem dengan dashboard
+function getProblemLabel(entry) {
+  const rt = String(entry?.RemarkType ?? entry?.["Remark Type"] ?? "").trim()
+  const rv = String(entry?.RemarkValue ?? entry?.["Remark Value"] ?? "").trim()
+  const rd = String(entry?.RemarkDetail ?? entry?.["Remark Detail"] ?? "").trim()
+
+  const mode = (window.CONFIG?.PROBLEM_MODE || "RemarkType").trim()
+
+  if (mode === "RemarkValue") return rv || "-"
+  if (mode === "RemarkValue+RemarkDetail") {
+    return rd ? `${rv || "-"} | ${rd}` : (rv || "-")
+  }
+  if (mode === "RemarkType+RemarkValue") {
+    return rv ? `${rt || "-"} | ${rv}` : (rt || "-")
+  }
+
+  // default
+  return rt || "-"
+}
+
+// ID generator (samakan dengan dashboard kalau perlu)
 function makeRowId(e) {
   const ts = String(e.Timestamp || "").trim()
   const code = String(e.Code || "").trim()
@@ -33,6 +73,19 @@ function makeRowId(e) {
   return [ts, code, master, channel, shift].join("||")
 }
 
+// normalisasi channel biar bisa tampil rapi (misal: "CH 0 - Cell 1" -> ambil "CH 0")
+// kalau gagal, tampilkan raw-nya aja
+function formatChOnly(rawChannel) {
+  const s = String(rawChannel ?? "").trim()
+  if (!s) return "-"
+  // ambil sebelum "-" pertama kalau ada
+  const parts = s.split("-").map((x) => x.trim()).filter(Boolean)
+  return parts[0] || s
+}
+
+// ================================
+// INIT
+// ================================
 document.addEventListener("DOMContentLoaded", async () => {
   const btnPrint = document.getElementById("btnPrint")
   if (btnPrint) btnPrint.addEventListener("click", () => window.print())
@@ -48,8 +101,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     Master: qs.get("m") || "",
   }
 
+  // ✅ UBAH SUBTITLE: CH • Code • Master
+  // (sementara pakai querystring dulu, nanti kalau entry ketemu kita update lagi biar makin akurat)
+  const chText = formatChOnly(key.Channel)
   document.getElementById("subtitleInfo").textContent =
-    `${key.Tanggal || "-"} • ${key.Channel || "-"} • Shift ${key.Shift || "-"}`
+    `${chText} • ${key.Code || "-"} • ${key.Master || "-"}`
 
   showLoading("Memuat detail NG...")
 
@@ -62,12 +118,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let entry = null
 
-    // ✅ 1) Cari pakai ID unik
+    // ================================
+    // 1️⃣ Cari pakai ID unik
+    // ================================
     if (key.id) {
       entry = allData.find((e) => makeRowId(e) === key.id)
     }
 
-    // ✅ 2) Fallback (kalau id kosong / ga ketemu)
+    // ================================
+    // 2️⃣ Fallback manual
+    // ================================
     if (!entry) {
       entry = allData.find((e) =>
         String(e.Tanggal || "") === String(key.Tanggal || "") &&
@@ -90,9 +150,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       return
     }
 
-    const problem = entry["Problem"] || "-"
-    const remarkValue = entry["Remark Value"] || "-"
-    const detail = entry["Detail"] || "-"
+    // ✅ update subtitle pakai data entry yang sudah pasti ada
+    const chFinal = formatChOnly(entry.Channel)
+    const codeFinal = entry.Code || "-"
+    const masterFinal = entry.Master || "-"
+    document.getElementById("subtitleInfo").textContent =
+      `${chFinal} • ${codeFinal} • ${masterFinal}`
+
+    // ================================
+    // Ambil field yang benar
+    // ================================
+    const problem = getProblemLabel(entry)
+    const remarkValue = pick(entry, ["RemarkValue", "Remark Value"], "-")
+    const detail = pick(entry, ["RemarkDetail", "Remark Detail", "Detail"], "-")
 
     body.innerHTML = `
       ${row("Tanggal", entry.Tanggal)}
