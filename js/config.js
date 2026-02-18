@@ -14,5 +14,3 @@ window.CONFIG = {
   MASTER_DATA_URL_CH0:
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vTrVEMf_DG702fbz5Gy12__YvNYc1lNXTW-gFcZbV5J0NSndYYvjQb_HmjsEWImsZBLAEZqlTs9eLDh/pub?gid=1956008952&single=true&output=csv",
 };
-
-//test
