@@ -1,39 +1,28 @@
 // ==========================================
 // form0.js — Channel 0 (Accordion per Machine)
-// TANPA ubah Apps Script (kompatibel format lama)
-//
-// Apps Script expect payload:
-// { tanggal, shift, npk, channel, bearingType, category, masters:[...] }
-//
-// Karena bearingType sekarang PER MACHINE,
-// saat klik Simpan -> kita kirim POST BERKALI-KALI (1x per machine)
-// supaya setiap request punya bearingType tunggal (sesuai Apps Script).
-//
-// UPDATE (sesuai form.js):
-// - OPT1 & OPT2: tambah textarea opsional "temuan/keterangan tambahan"
-//   -> disubmit masuk ke remarkDetail (kolom Detail), remarkValue tetap angka deviasi (wajib)
-//
-// Kolom sheet target:
-// Code, Timestamp, Tanggal, Shift, NPK, Channel, Tipe bearing, Kategori, Master, Status, Remark Value, Problem, Detail
 // ==========================================
 
 let MASTER_DATA = [];
 
 // =========================
-// REMARK 4 OPSI
+// REMARK 6 OPSI (UPDATED)
 // =========================
 const REMARK_TYPE_LABELS = {
   OPT1: "Deviasi nilai (master tetap)",
   OPT2: "Deviasi nilai (master diganti)",
-  OPT3: "Master rusak/hilang (ganti baru)",
-  OPT4: "Lainnya",
+  OPT3: "Master hilang",
+  OPT4: "Cacat visual",
+  OPT5: "Marking hilang",
+  OPT6: "Lainnya",
 };
 
 const REMARK_HELPER = {
   OPT1: "Remark hanya boleh diisi angka (deviasi nilai). Contoh: +5 / -2 / 0.02 / -15;-16;-17",
   OPT2: "Remark hanya boleh diisi angka (deviasi nilai). Contoh: +5 / -2 / 0.02 / -15;-16;-17",
-  OPT3: "Opsional: jelaskan kondisi (contoh: holder patah / master hilang).",
-  OPT4: "Wajib: jelaskan kondisi/temuan lainnya.",
+  OPT3: "Opsional: jelaskan kondisi (contoh: master tidak ditemukan).",
+  OPT4: "Opsional: jelaskan cacat visual (contoh: baret/retak/korosi).",
+  OPT5: "Opsional: jelaskan kondisi (contoh: marking pudar/hilang total).",
+  OPT6: "Wajib: jelaskan kondisi/temuan lainnya.",
 };
 
 // ✅ NEW: textarea opsional khusus OPT1/OPT2 (temuan tambahan)
@@ -423,7 +412,7 @@ function renderMastersInto(container, list, prefix) {
         <div style="margin-top:10px; font-weight:600;">Jenis Remark</div>
 
         <div class="remark-type-group" style="display:block; margin-top:6px;">
-          ${["OPT1","OPT2","OPT3","OPT4"].map(opt => `
+          ${["OPT1","OPT2","OPT3","OPT4","OPT5","OPT6"].map(opt => `
             <label style="display:block; margin:6px 0; cursor:pointer;">
               <input type="radio" name="remarkType_${prefix}_${idx}" value="${opt}">
               ${REMARK_TYPE_LABELS[opt]}
@@ -507,14 +496,14 @@ function renderMastersInto(container, list, prefix) {
         if (oBox) oBox.style.display = "block";
         if (oHelp) oHelp.textContent = REMARK_OPT_HELPER[opt] || "Opsional.";
 
-        // pastikan detail OPT3/4 kosong
+        // pastikan detail OPT3/4/5/6 kosong
         if (dHelp) dHelp.textContent = "";
         if (dInput) dInput.value = "";
         return;
       }
 
-      if (opt === "OPT3" || opt === "OPT4") {
-        // OPT3/4: detail utama
+      if (opt === "OPT3" || opt === "OPT4" || opt === "OPT5" || opt === "OPT6") {
+        // OPT3/4/5/6: detail utama (textarea)
         if (dBox) dBox.style.display = "block";
         if (dHelp) dHelp.textContent = REMARK_HELPER[opt];
 
@@ -654,7 +643,7 @@ async function submitDataMultiRequest() {
     return;
   }
 
-  showLoading("Menyimpan data (per machine)...");
+  showLoading("Menyimpan data...");
 
   try {
     let insertedTotal = 0;
@@ -690,8 +679,8 @@ async function submitDataMultiRequest() {
           remarkType = REMARK_TYPE_LABELS[opt] || "";
 
           const vInput = card.querySelector(".remark-value");
-          const oInput = card.querySelector(".remark-opt-detail"); // ✅ NEW (opsional OPT1/2)
-          const dInput = card.querySelector(".remark-detail");     // OPT3/4
+          const oInput = card.querySelector(".remark-opt-detail"); // ✅ opsional OPT1/2
+          const dInput = card.querySelector(".remark-detail");     // OPT3/4/5/6
 
           const vErr = card.querySelector(".remark-value-err");
           const dErr = card.querySelector(".remark-detail-err");
@@ -723,12 +712,28 @@ async function submitDataMultiRequest() {
           }
 
           if (opt === "OPT3") {
+            // Master hilang (opsional detail)
             remarkValue = "";
             remarkDetail = (dInput ? dInput.value : "").trim(); // opsional
             remark = remarkDetail ? `${remarkType}: ${remarkDetail}` : `${remarkType}`;
           }
 
           if (opt === "OPT4") {
+            // Cacat visual (opsional detail)
+            remarkValue = "";
+            remarkDetail = (dInput ? dInput.value : "").trim(); // opsional
+            remark = remarkDetail ? `${remarkType}: ${remarkDetail}` : `${remarkType}`;
+          }
+
+          if (opt === "OPT5") {
+            // Marking hilang (opsional detail)
+            remarkValue = "";
+            remarkDetail = (dInput ? dInput.value : "").trim(); // opsional
+            remark = remarkDetail ? `${remarkType}: ${remarkDetail}` : `${remarkType}`;
+          }
+
+          if (opt === "OPT6") {
+            // Lainnya (WAJIB detail) -> pindahan dari OPT4 lama
             const d = (dInput ? dInput.value : "").trim();
             if (!d) {
               if (dErr) {
@@ -767,7 +772,7 @@ async function submitDataMultiRequest() {
 
     alert(`Data berhasil disimpan! Total baris: ${insertedTotal}`);
     sessionStorage.clear();
-    window.location.href = "InputData.html";
+    window.location.href = "form0.html";
   } catch (err) {
     console.error(err);
     alert("Gagal menyimpan data.\n" + err.message);
