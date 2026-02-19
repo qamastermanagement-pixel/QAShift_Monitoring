@@ -1,5 +1,7 @@
 // ==========================================
 // form0.js — Channel 0 (Accordion per Machine)
+// Kolom sheet target:
+// Code, Timestamp, Tanggal, Shift, NPK, Channel, Tipe bearing, Kategori, Master, Status, Remark Value, Problem, Detail
 // ==========================================
 
 let MASTER_DATA = [];
