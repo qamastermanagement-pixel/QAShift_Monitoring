@@ -1,21 +1,5 @@
 // ===================================================
 // form.js (AUTO UI CARD) + FETCH MASTER CSV + REMARK 6 OPSI
-// - UI Step2 pakai CARD (master-item) seperti versi lama
-// - Remark 6 opsi (OPT1..OPT6) vertical
-// - AUTO buat #masterList kalau HTML Step2 tidak punya
-// - AUTO sembunyikan header table "No Master Status Remark" jika masih ada di HTML
-// - Payload masters: remarkValue, remarkType, remarkDetail
-//
-// UPDATE:
-// - OPT1 & OPT2: tambah textarea opsional (keterangan tambahan)
-//   -> disubmit masuk ke remarkDetail (bukan kolom baru)
-//   -> remarkValue tetap khusus angka deviasi (tetap wajib + validasi sama)
-//
-// PERUBAHAN OPSI:
-// - OPT3: Master hilang (detail opsional)
-// - OPT4: Cacat visual (detail opsional)
-// - OPT5: Marking hilang (detail opsional)
-// - OPT6: Lainnya (detail WAJIB)
 // ===================================================
 
 let MASTER_DATA = [];
