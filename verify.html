@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Certificate of Calibration - QA Master Management</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/verify.css" />
+</head>
+<body>
+  <nav class="nav-header">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="brand-logo">SKF</span>
+        <span class="brand-text">QA Master Management</span>
+      </div>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="InputData.html" class="nav-link">Input Data</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="verify.html" class="nav-link active">Certificate</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+    <div class="actions">
+      <div class="left">
+        <button class="btn btn-primary" id="btnPrint" type="button">Print / Save as PDF</button>
+        <button class="btn btn-ghost" id="btnCopyLink" type="button">Copy Link</button>
+      </div>
+      <div class="pill" id="pillCode">code: -</div>
+    </div>
+
+    <div class="notice" id="topMessage">Memuat certificate...</div>
+
+    <div class="cert">
+      <div class="cert-border">
+        <div class="cert-head">
+          <div class="brand">
+            <img src="assets/SKF-logo.png" alt="SKF Logo" onerror="this.style.display='none'">
+            <div>
+              <div class="org">QA Master Management</div>
+              <div class="dept">Calibration & Verification</div>
+            </div>
+          </div>
+
+          <div class="cert-meta">
+            <div><b>Certificate View</b></div>
+            <div id="metaGenerated">Generated: -</div>
+            <div id="metaRef">Reference: -</div>
+          </div>
+        </div>
+
+        <div class="cert-title">
+          <h1>CERTIFICATE OF CALIBRATION</h1>
+          <p>Verification of Calibration Master</p>
+        </div>
+
+        <div class="grid">
+          <div class="section">
+            <h3>Master Information</h3>
+            <div class="kv">
+              <div class="k">Master Code</div><div class="v" id="vMasterCode">-</div>
+              <div class="k">Type</div><div class="v" id="vType">-</div>
+              <div class="k">Channel</div><div class="v" id="vChannel">-</div>
+              <div class="k">Master’s Name</div><div class="v" id="vMasterName">-</div>
+              <div class="k">Value</div><div class="v" id="vValue">-</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>Calibration Schedule</h3>
+            <div class="kv">
+              <div class="k">Last Calibration</div><div class="v" id="vLastCal">-</div>
+              <div class="k">Next Calibration (Due)</div><div class="v" id="vNextCal">-</div>
+              <div class="k">Status</div><div class="v" id="vStatusText">-</div>
+            </div>
+
+            <div class="status unknown" id="statusBox">LOADING...</div>
+          </div>
+        </div>
+
+        <div class="cert-foot">
+          <div class="sign">
+            <div class="line">Certified by Quality Assurance</div>
+          </div>
+
+          <div class="notes">
+            This certificate is generated from the QA Master Management database.<br>
+            Any updates on calibration dates will be reflected on this page.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/verify.js"></script>
+</body>
+</html>
